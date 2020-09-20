@@ -1,9 +1,24 @@
 #! python3
+# To-Do:
+# 1. Move JIRA URL to config_admin.ini and use config parser in subr_jira_download.py
+#
 #------------------------------------#
 # This section will install python 
 # modules needed to run this script
 #------------------------------------#
 import os, sys
+
+import _config as config_db
+
+try:
+
+    import configparser
+
+except:
+
+    os.system('pip install configparser')
+
+    import configparser
 
 try:
 
@@ -76,6 +91,8 @@ except:
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
+my_pgm = os.path.basename(__file__)
+
 new_dir =""
 
 global in_ticket
@@ -122,7 +139,7 @@ try:
     b = ParseConfig(class_chart, 'config_admin.ini')
 
 except Exception as e:
-
+    
     print("#######################################")
 
     print("# WARNING" + os.path.basename(__file__) )
@@ -148,7 +165,8 @@ except Exception as e:
 
     print("#------------------------------------#")
 
-    print("WARNING: " + os.path.basename(__file__))
+    print("WARNING: " + os.path.basename(__file__) + " in directory " + os.getcwd())
+
     print("#------------------------------------#")
 
     print("# " + os.path.basename(__file__) + " unable to reference REPORTING section of config_admin.ini")
@@ -159,27 +177,21 @@ except Exception as e:
 
     print(e)
 
-
 #######################################
 # Start by extracting the LOGGING 
 #    reporting level for output 
 #    granularity (how much detail).
 #######################################
-
-
-
-
-#######################################
+#--------------------------------------
 # Log the beginning of processsing
-#######################################
-
-
+#--------------------------------------
 
 logger = logging.getLogger()
 
 if log_level in ("DEBUG", "INFO"):
 
     logger.setLevel(logging.INFO)
+
 else:
 
     logger.setLevel(logging.WARNING)
@@ -242,43 +254,34 @@ except:
 ######################################
 if __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-
-        in_ticket = sys.argv[1]
-
-        new_dir = str("EXA-" + str(in_ticket))
-
-    else:
-
-        in_ticket = 28727
-
-        new_dir = str("EXA-" + str(in_ticket))
-
-    if len(sys.argv) > 2:
-
-        config_in = sys.argv[2]
-
-    else:
+    if len(sys.argv) == 1:
 
         config_in = 'config_reports.ini'
 
-else:
+        in_ticket = ''
 
-    in_ticket - 28727
+        new_dir = (config_db.dsn)
 
-    new_dir = str("EXA-" + str(in_ticket))
+    elif len(sys.argv) == 2 :
 
-    config_in = 'config_reports.ini'
+        config_in = sys.argv[1]
+
+        new_dir = (config_db.dsn)
+
+    elif len(sys.argv) > 2:
+
+        config_in = sys.argv[1]
+
+        in_ticket = sys.argv[2]
+
+        new_dir = str("EXA-" + str(in_ticket))
+
 
 #######################################
 #######################################
 # BEGIN MAIN LOGIC
 #######################################
 #######################################
-
-
-
-
 
 work_dir = os.getcwd()
 #logger.basicConfig(level = logger.INFO, filename = logging_filename, filemode = 'a', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
@@ -332,18 +335,92 @@ else:
     sys.exit(0)
 
 
+if len(str(in_ticket)) > 3:
 
-DAILY_TBLZ   = ['EXA_DB_SIZE_DAILY', 'EXA_SQL_DAILY', 'EXA_MONITOR_DAILY', 'EXA_USAGE_DAILY']
+    msg_info = "# " + os.path.basename(__file__) + " is calling jira_download.py with " + str(in_ticket)
 
-HOURLY_TBLZ  = ['EXA_DB_SIZE_HOURLY','EXA_SQL_HOURLY','EXA_MONITOR_HOURLY','EXA_USAGE_HOURLY']
+    logger.info(msg_info)
+
+    print("# INFO:", os.path.basename(__file__))
+
+    print("# is calling jira_download.py with", str(in_ticket))
+
+    print("#####################################")
+
+    print()
+
+    msg_info = "# Executing call " + dir_path + '\\' + "subr_jira_download.py " + str(in_ticket)
+
+    logger.info(msg_info)
+
+
+    subr_rc = subprocess.call(["python", dir_path + "/" + "subr_jira_download.py", str(in_ticket)])
+
+    if subr_rc != 0:
+
+        logger.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from subr_jira_download.py")
+
+        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+
+        print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from subr_jira_download.py")
+
+        print("#####################################")
+
+        sys.exit(-1)
+
+else:
+
+    msg_info = "# Executing call " + dir_path + '\\' + "test_get_config_tbls.py " 
+
+    logger.info(msg_info)
+
+    subr_rc = subprocess.call(["python", dir_path + "/" + "test_get_config_tbls.py"])
+
+    if subr_rc != 0:
+
+        logger.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from test_get_config_tbls.py")
+
+        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+
+        print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from test_get_config_tbls.py")
+
+        print("#####################################")
+
+        sys.exit(-1)
+
+
+config = configparser.ConfigParser()
+
+config.read(os.getcwd() + '/' + config_in)
+
+DAILY_TBLZ = []
+
+HOURLY_TBLZ = []
+
+for section in config.sections():
+
+    if config[section]['CONFIG_HOURLY_TBL'] not in HOURLY_TBLZ:
+
+        HOURLY_TBLZ.append(config[section]['CONFIG_HOURLY_TBL'])
+
+    if config[section]['CONFIG_DAILY_TBL'] not in DAILY_TBLZ:
+
+        DAILY_TBLZ.append(config[section]['CONFIG_DAILY_TBL'])
+
+
 
 for table in range(len(DAILY_TBLZ)):
 
     DAILY_TBLZ[table] = str(DAILY_TBLZ[table] + '.csv')
 
+for table in range(len(HOURLY_TBLZ)):
+
     HOURLY_TBLZ[table] = str(HOURLY_TBLZ[table] + '.csv')
 
-os.chdir(dir_path)
+print(my_pgm + ": HOURLY_TBLZ after CSV conversion", HOURLY_TBLZ)
+print(my_pgm + ": DAILY_TBLZ after CSV conversion", DAILY_TBLZ)
+
+#os.chdir(dir_path)
 
 msg_info = "# " + os.path.basename(__file__) + " processing igapa pgms in directory " + os.getcwd()
 
@@ -351,21 +428,28 @@ logger.info(msg_info)
 
 print()
 
-if (
-     (os.path.exists(work_dir + '\\' + DAILY_TBLZ[0])  and (os.path.exists(work_dir + '\\' + HOURLY_TBLZ[0]))) or
+print(msg_info)
 
-     (os.path.exists(work_dir + '\\' + DAILY_TBLZ[1])  and (os.path.exists(work_dir + '\\' + HOURLY_TBLZ[1]))) or 
+print()
 
-     (os.path.exists(work_dir + '\\' + DAILY_TBLZ[2])  and (os.path.exists(work_dir + '\\' + HOURLY_TBLZ[2]))) or 
+if (os.path.exists(new_dir + '\\' + DAILY_TBLZ[0])  and (os.path.exists(new_dir + '\\' + HOURLY_TBLZ[0]))) : 
 
-     (os.path.exists(work_dir + '\\' + DAILY_TBLZ[3])  and (os.path.exists(work_dir + '\\' + HOURLY_TBLZ[3]))) 
-    ):
+    if len(in_ticket) > 3:
 
-        msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + str(in_ticket)  + " " + str(config_in)
+        msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + str(new_dir)  + " " + str(config_in)
 
         logger.info(msg_info)
 
-        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(in_ticket), str(config_in)])
+        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(new_dir), str(config_in)])
+
+    else:
+
+        msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + config_db.dsn  + " " + str(config_in)
+
+        logger.info(msg_info)
+
+        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(config_db.dsn), str(config_in)])
+
 
 else:
 
@@ -393,21 +477,9 @@ else:
 
     logger.warning("#")
 
-    logger.warning("# This solution is looking for either: ")
+    logger.warning("# This solution is looking for: ")
 
     logger.warning("# " +  str(new_dir + '\\' + DAILY_TBLZ[0]) + " and " +  str(new_dir + '\\' + HOURLY_TBLZ[0]) )
-
-    logger.warning("# OR")
-
-    logger.warning("# " +  str(new_dir + '\\' + DAILY_TBLZ[1]) +" and " +  str(new_dir + '\\' + HOURLY_TBLZ[1]) )
-
-    logger.warning("# OR")
-
-    logger.warning("# " +  str(new_dir + '\\' + DAILY_TBLZ[2]) + " and " +  str(new_dir + '\\' + HOURLY_TBLZ[2]) )
-
-    logger.warning("# OR")
-
-    logger.warning("# " +  str(new_dir + '\\' + DAILY_TBLZ[3]) + " and " +  str(new_dir + '\\' + HOURLY_TBLZ[3]) )
 
     logger.warning("#####################################")
 
@@ -421,21 +493,9 @@ else:
 
     print("#")
 
-    print("# This solution is looking for either: ")
+    print("# This solution is looking for: ")
 
     print("#", str(new_dir + '\\' + DAILY_TBLZ[0]), "and", str(new_dir + '\\' + HOURLY_TBLZ[0]) )
-
-    print("# OR")
-
-    print("#", str(new_dir + '\\' + DAILY_TBLZ[1]), "and", str(new_dir + '\\' + HOURLY_TBLZ[1]) )
-
-    print("# OR")
-
-    print("#", str(new_dir + '\\' + DAILY_TBLZ[2]), "and", str(new_dir + '\\' + HOURLY_TBLZ[2]) )
-
-    print("# OR")
-
-    print("#", str(new_dir + '\\' + DAILY_TBLZ[3]), "and", str(new_dir + '\\' + HOURLY_TBLZ[3]) )
 
     print("#####################################")
 

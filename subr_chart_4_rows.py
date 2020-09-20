@@ -281,7 +281,7 @@ def log_and_print_error(msg):
 # Set up processinging logic
 #######################################
 
-save_dir = os.getcwd()
+save_dir = os.getcwd() 
 
 if __name__ == "__main__":
 
@@ -291,13 +291,17 @@ if __name__ == "__main__":
 
     log_and_print_info("#--------------------------------------#")
 
+
+
     if len(sys.argv) > 1:
+
+        print(os.path.basename(__file__) + " has sys.argv[1] as " + sys.argv[1])
 
         in_ticket = sys.argv[1]
 
     else:
        
-        in_ticket = 28727
+        in_ticket = 'EXA-28615'
 
     if len(sys.argv) > 2:
 
@@ -491,6 +495,8 @@ CONFIG_ROW4_COL_Y_AXIS_2 = False
 ########################################
 
 
+os.chdir(in_ticket)
+
 for config_section in config_sections:
 
     process_section = ParseConfig(config_section, config_in)
@@ -572,6 +578,9 @@ for config_section in config_sections:
 #######################################
 
     currPath = os.getcwd()              # Directory you are in NOW
+
+
+    print(os.path.basename(__file__) + " current about to process TABLE1 in dir " + currPath)
 
 ###############################################################################
 #   #######   #     ####    #      ######  ##

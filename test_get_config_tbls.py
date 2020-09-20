@@ -87,8 +87,6 @@ if __name__ == '__main__':
 
     my_output = a.run()
 
-    print("my_output returns", my_output)
-
     for table in my_output:
 
         subr_rc = subprocess.call(["python", "./" + "export_cloud_to_csv.py", table])

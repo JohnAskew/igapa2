@@ -7,6 +7,19 @@ import os, sys
 
 import _config as config
 
+
+from tools_logger import *
+
+try:
+
+    from datetime import datetime as dt
+
+except:
+
+    os.system('pip install datetime')
+
+    from datetime import datetime as dt
+
 try:
 
     import pyexasol
@@ -38,7 +51,50 @@ except:
     import pandas as pd
 
 
+#######################################
+# FUNCTIONS
+#######################################
 
+#--------------------------------------
+def get_table_and_cols(TABLE, saveFile):
+#--------------------------------------
+    
+    try:
+
+        print()
+
+        myFile = C.export_to_file(saveFile, TABLE, export_params={"with_column_names":True})
+
+        stmt = C.last_statement()
+
+        print(f'{my_pgm} EXPORTED {stmt.rowcount()} rows from table {TABLE} in {stmt.execution_time}s')
+
+        logging.info("# " + my_pgm + " EXPORTED " + str(stmt.rowcount()) + " rows from table " + TABLE + " in " + str(stmt.execution_time) + " sec")
+
+
+    except Exception as e:
+
+        print(os.path.basename(__file__), "unable to READ table", TABLE, "skipping with no action taken!")
+
+        print(e)
+
+        sys.exit(0)   
+
+
+
+#######################################
+# MAIN LOGIC
+#######################################
+
+my_pgm = os.path.basename(__file__)
+
+my_path = os.getcwd()
+
+now = dt.today().strftime('%Y-%m-%d-%H:%M:%S')
+
+logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+
+logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'a', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
 TABLE=''
 
@@ -46,11 +102,18 @@ if len(sys.argv) > 1:
 
     TABLE = sys.argv[1]
     
-    print("INCOMING: sys.argv", sys.argv, "table", TABLE)
-
 else:
     
     TABLE = 'EXA_DB_SIZE_HOURLY'
+
+logging.info("#--------------------------------------#")
+
+logging.info("# Entering " + os.path.basename(__file__))
+
+logging.info("#--------------------------------------#")
+
+logging.info("# " + my_pgm +  " called with TABLE " + TABLE )
+
 
 
 
@@ -69,6 +132,8 @@ if not os.path.exists(myPath):      # The directory you are in NOW
 
 os.chdir(myPath)                    # move into the newly created sub-dir
 
+logging.info("# " + my_pgm + " working dir directory " + myPath )
+
 subject= TABLE
 
 saveFile=(subject + '.csv')    # The RESUlTS we are saving on a daily basis
@@ -83,7 +148,9 @@ try:
 
     C = pyexasol.connect(dsn=(config.dsn + ":" + str(config.port)), user=config.user, password=config.password, schema=config.schema, compression=True)
     
-    print("INFO: Successfully connected to database using schema", config.schema)
+    print("INFO: ", my_pgm, "successfully connected to database using schema", config.schema)
+
+    logging.info("# " + my_pgm +  " successfully connected to database using schema " + config.schema)
 
 except Exception as e:
     
@@ -93,28 +160,6 @@ except Exception as e:
     
     sys.exit(0)
 
-try:
-
-    print("TABLE", TABLE, "saveFile:", saveFile)
-    
-    print()
-
-    myFile = C.export_to_file(saveFile, TABLE, export_params={"with_column_names":True})
-
-    stmt = C.last_statement()
-
-    print(f'EXPORTED {stmt.rowcount()} rows in {stmt.execution_time}s')
-
-    print(C.meta.sql_columns("Select * from " + TABLE))
-
-    print("You are currently in", os.getcwd())
-    
-
-except Exception as e:
-
-    print("Unable to READ, skipping")
-
-    print(e)
-
-    sys.exit(0)     
+get_table_and_cols(TABLE, saveFile)
+  
 
