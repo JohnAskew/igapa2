@@ -20,6 +20,8 @@ Igapa with multi source data pull - Jira or from DB.
 
 **igapa_master** - Main program. This is what is execute in Python.
 
-**sub_char_4_rows.py** - Reads config file and builds charts.
+**subr_char_4_rows.py** - Reads config file and builds charts.
+
+**subr_validate_ticket.py** - Validate JIRA ticket exists on system.
 
 **test_get_config_tbls.py** - Reads config file, extracts Tables and calls **export_cloud_to_csv.py**.
