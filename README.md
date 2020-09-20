@@ -25,3 +25,6 @@ Igapa with multi source data pull - Jira or from DB.
 **subr_validate_ticket.py** - Validate JIRA ticket exists on system.
 
 **test_get_config_tbls.py** - Reads config file, extracts Tables and calls **export_cloud_to_csv.py**.
+
+**tools_get_table_cols.py** - Pass in table, get back table columns
+
