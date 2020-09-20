@@ -28,7 +28,7 @@ except:
 
 now = dt.today().strftime('%Y-%m-%d-%H:%M:%S')
 
-logging_filename = "igapa_master.py.log"
+my_pgm = os.path.basename(__file__)
 
 logger = logging.getLogger()
 
@@ -36,13 +36,17 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-fh = logging.FileHandler(logging_filename, mode = 'a')
+logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
 
-fh.setLevel(logging.INFO)
+logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-fh.setFormatter(formatter)
+# fh = logging.FileHandler(logging_filename, mode = 'a')
 
-logger.addHandler(fh)
+# fh.setLevel(logging.INFO)
+
+# fh.setFormatter(formatter)
+
+# logger.addHandler(fh)
 
 ch = logging.StreamHandler()
 
