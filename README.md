@@ -28,3 +28,5 @@ Igapa with multi source data pull - Jira or from DB.
 
 **tools_get_table_cols.py** - Pass in table, get back table columns
 
+**tools_logger.py** - Set up logging. Imported by programs using logging.
+
