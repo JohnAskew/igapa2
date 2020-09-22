@@ -67,6 +67,12 @@ class ParseConfig:
 
         self.which_config = which_config
 
+        my_pgm = os.path.basename(__file__)
+
+        self.logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+
+        logging.basicConfig(filename = self.logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+
         logging.info("#--------------------------------------#")
 
         logging.info("# Entering " + os.path.basename(__file__))

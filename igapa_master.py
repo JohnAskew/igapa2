@@ -1,12 +1,59 @@
-#! python3
-# To-Do:
-# 1. Move JIRA URL to config_admin.ini and use config parser in subr_jira_download.py
-#
+'''
+name: igapa_master.py
+desc: Main program to run solution.
+
+To-Do:
+1. Move JIRA URL to config_admin.ini and use config parser in subr_jira_download.py
+2. Try setting all the logging_filename in each pgm to igapa_master.log
+3. All logging programs log an exit message.
+4. Ensure each program doing a call has a log entry stating it's call program..
+'''
+import os
+
+import sys
+
+try:
+
+    from datetime import datetime as dt
+
+except:
+
+    os.system('pip install datetime')
+
+    from datetime import datetime as dt
+
+my_pgm = os.path.basename(__file__)
+
+now = dt.today().strftime('%Y%m%d_%H%M%S')
+
+logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+
+if os.path.exists(logging_filename):
+
+    dest = str(logging_filename + '_' + now + '.log')
+
+    try:
+
+        os.rename(logging_filename, dest)
+
+    except Exception as e:
+
+        print("#--------------------------------------#")
+
+        print("# WARNING: " + os.path.basename(__file__) + " Unable to rename " + logging_filename + " to " + dest)
+
+        print("# " + os.path.basename(__file__) + " REUSING " + logging_filename)
+
+        print(e)
+
+        print("#--------------------------------------#")
+
+
 #------------------------------------#
 # This section will install python 
 # modules needed to run this script
 #------------------------------------#
-import os, sys
+
 
 import _config as config_db
 
@@ -42,31 +89,21 @@ except:
 
 try:
 
-    from datetime import datetime as dt
-
-except:
-
-    os.system('pip install datetime')
-
-    from datetime import datetime as dt
-
-try:
-
     from tools_parse_config import ParseConfig
 
 except:
     
     msg = "Unable to find tools_parse_config.py"
 
-    logger.error("#######################################")
+    logging.error("#######################################")
 
-    logger.error("# ERROR in " +  os.path.basename(__file__))
+    logging.error("# ERROR in " +  os.path.basename(__file__))
     
-    logger.error("# " + msg)
+    logging.error("# " + msg)
 
-    logger.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
+    logging.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
 
-    logger.error("#######################################")
+    logging.error("#######################################")
 
     print("#######################################")
 
@@ -91,8 +128,6 @@ except:
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-my_pgm = os.path.basename(__file__)
-
 new_dir =""
 
 global in_ticket
@@ -101,39 +136,75 @@ in_ticket = ""
 
 class_chart = 'DB_SIZE'
 
-now = dt.today().strftime('%Y%m%d_%H%M%S')
-
 log_level = "WARNING"
-
-logging_filename = str(os.path.basename(__file__) + '.log')
 
 #######################################
 # Save off the old report - do not overlay
 #######################################
 
-if os.path.exists(logging_filename):
-
-    dest = str(logging_filename + '_' + now + '.log')
-
-    try:
-
-        os.rename(logging_filename, dest)
-
-    except Exception as e:
-
-        print("#--------------------------------------#")
-
-        print("# WARNING: " + os.path.basename(__file__) + " Unable to rename " + logging_filename + " to " + dest)
-
-        print("# " + os.path.basename(__file__) + " REUSING " + logging_filename)
-
-        print(e)
-
-        print("#--------------------------------------#")
-
 #-------------------------------------#
 # Extract log_level for reporting details
 # ------------------------------------#
+#######################################
+# Start by extracting the LOGGING 
+#    reporting level for output 
+#    granularity (how much detail).
+#######################################
+#--------------------------------------
+# Log the beginning of processsing
+#--------------------------------------
+
+log_level ="INFO"
+
+logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+
+
+logging.info("#####################################")
+
+msg_info = "# Starting " + os.path.basename(__file__)
+
+logging.info(msg_info)
+
+logging.info("#####################################")
+
+
+try:
+
+    from tools_parse_config import ParseConfig
+
+except:
+    
+    msg = "Unable to find tools_parse_config.py"
+
+    logging.error("#######################################")
+
+    logging.error("# ERROR in " +  os.path.basename(__file__))
+    
+    logging.error("# " + msg)
+
+    logging.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
+
+    logging.error("#######################################")
+
+    print("#######################################")
+
+    print("# ERROR in", os.path.basename(__file__))
+    
+    print(msg)
+
+    print("#", os.path.basename(__file__), "aborting with no action taken.")
+
+    print("#######################################")
+
+    sys.exit(13)
+
+
+#--------------------------------------
+# Get admin configurations
+#--------------------------------------
+
+logging.info("# " + my_pgm + " calling tools_parse_config")
+
 try:
 
     b = ParseConfig(class_chart, 'config_admin.ini')
@@ -177,76 +248,6 @@ except Exception as e:
 
     print(e)
 
-#######################################
-# Start by extracting the LOGGING 
-#    reporting level for output 
-#    granularity (how much detail).
-#######################################
-#--------------------------------------
-# Log the beginning of processsing
-#--------------------------------------
-
-logger = logging.getLogger()
-
-if log_level in ("DEBUG", "INFO"):
-
-    logger.setLevel(logging.INFO)
-
-else:
-
-    logger.setLevel(logging.WARNING)
-
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
-
-fh = logging.FileHandler(logging_filename, mode = 'a')
-
-fh.setLevel(logging.INFO)
-
-fh.setFormatter(formatter)
-
-logger.addHandler(fh)
-
-ch = logging.StreamHandler()
-
-ch.setLevel(logging.INFO)
-
-ch.setFormatter(formatter)
-
-logger.addHandler(ch)
-
-try:
-
-    from tools_parse_config import ParseConfig
-
-except:
-    
-    msg = "Unable to find tools_parse_config.py"
-
-    logger.error("#######################################")
-
-    logger.error("# ERROR in " +  os.path.basename(__file__))
-    
-    logger.error("# " + msg)
-
-    logger.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
-
-    logger.error("#######################################")
-
-    print("#######################################")
-
-    print("# ERROR in", os.path.basename(__file__))
-    
-    print(msg)
-
-    print("#", os.path.basename(__file__), "aborting with no action taken.")
-
-    print("#######################################")
-
-    sys.exit(13)
-
-
-
-
 # log_level = "WARNING"
 
 ######################################
@@ -284,37 +285,30 @@ if __name__ == "__main__":
 #######################################
 
 work_dir = os.getcwd()
-#logger.basicConfig(level = logger.INFO, filename = logging_filename, filemode = 'a', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
-
-logger.info("#####################################")
-
-msg_info = "# Starting " + os.path.basename(__file__)
-
-logger.info(msg_info)
 
 filename = str(os.getcwd() + '\\' + config_in)
 
 if os.path.exists(filename):
 
-    logger.info("# " + os.path.basename(__file__) + " was given config file " + config_in)
+    logging.info("# " + os.path.basename(__file__) + " was given config file " + config_in)
 
 else:
 
-    logger.error("#####################################")
+    logging.error("#####################################")
 
-    logger.error("# " + os.path.basename(__file__)) 
+    logging.error("# " + os.path.basename(__file__)) 
 
-    logger.error("# " + os.path.basename(__file__) + " Could not find config file: " + config_in)
+    logging.error("# " + os.path.basename(__file__) + " Could not find config file: " + config_in)
 
-    logger.error("# " + os.path.basename(__file__) + " Ensure " + config_in + " exists in this directory: " + os.getcwd())
+    logging.error("# " + os.path.basename(__file__) + " Ensure " + config_in + " exists in this directory: " + os.getcwd())
 
-    logger.error("# ---> Does " + config_in + " exist?")
+    logging.error("# ---> Does " + config_in + " exist?")
 
-    logger.error("# ---> Is "  + config_in + " a readable file?")
+    logging.error("# ---> Is "  + config_in + " a readable file?")
 
-    logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken")
+    logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken")
 
-    logger.error("#####################################")
+    logging.error("#####################################")
 
     print("#####################################")
 
@@ -339,7 +333,7 @@ if len(str(in_ticket)) > 3:
 
     msg_info = "# " + os.path.basename(__file__) + " is calling jira_download.py with " + str(in_ticket)
 
-    logger.info(msg_info)
+    logging.info(msg_info)
 
     print("# INFO:", os.path.basename(__file__))
 
@@ -351,16 +345,16 @@ if len(str(in_ticket)) > 3:
 
     msg_info = "# Executing call " + dir_path + '\\' + "subr_jira_download.py " + str(in_ticket)
 
-    logger.info(msg_info)
+    logging.info(msg_info)
 
 
     subr_rc = subprocess.call(["python", dir_path + "/" + "subr_jira_download.py", str(in_ticket)])
 
     if subr_rc != 0:
 
-        logger.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from subr_jira_download.py")
+        logging.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from subr_jira_download.py")
 
-        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
 
         print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from subr_jira_download.py")
 
@@ -372,15 +366,15 @@ else:
 
     msg_info = "# Executing call " + dir_path + '\\' + "test_get_config_tbls.py " 
 
-    logger.info(msg_info)
+    logging.info(msg_info)
 
     subr_rc = subprocess.call(["python", dir_path + "/" + "test_get_config_tbls.py"])
 
     if subr_rc != 0:
 
-        logger.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from test_get_config_tbls.py")
+        logging.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from test_get_config_tbls.py")
 
-        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
 
         print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from test_get_config_tbls.py")
 
@@ -424,7 +418,7 @@ print(my_pgm + ": DAILY_TBLZ after CSV conversion", DAILY_TBLZ)
 
 msg_info = "# " + os.path.basename(__file__) + " processing igapa pgms in directory " + os.getcwd()
 
-logger.info(msg_info)
+logging.info(msg_info)
 
 print()
 
@@ -438,7 +432,7 @@ if (os.path.exists(new_dir + '\\' + DAILY_TBLZ[0])  and (os.path.exists(new_dir 
 
         msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + str(new_dir)  + " " + str(config_in)
 
-        logger.info(msg_info)
+        logging.info(msg_info)
 
         subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(new_dir), str(config_in)])
 
@@ -446,7 +440,7 @@ if (os.path.exists(new_dir + '\\' + DAILY_TBLZ[0])  and (os.path.exists(new_dir 
 
         msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + config_db.dsn  + " " + str(config_in)
 
-        logger.info(msg_info)
+        logging.info(msg_info)
 
         subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(config_db.dsn), str(config_in)])
 
@@ -499,7 +493,8 @@ else:
 
     print("#####################################")
 
+logging.info("#####################################")
 
-logger.info("# " + os.path.basename(__file__) + " succeessful exit.")
+logging.info("# " + os.path.basename(__file__) + " succeessful exit.")
 
-logger.info("#####################################")
+logging.info("#####################################")

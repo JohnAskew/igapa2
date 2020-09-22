@@ -84,9 +84,19 @@ class_chart = 'DB_SIZE'
 
 now = dt.today().strftime('%Y%m%d_%H%M%S')
 
-log_level = "WARNING"
+log_level = "INFO"
 
-logging_filename = str(os.path.basename(__file__) + '.log')
+my_pgm = os.path.basename(__file__)
+
+logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+
+logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+
+logging.info("#--------------------------------------#")
+
+logging.info("# Entering " + os.path.basename(__file__))
+
+logging.info("#--------------------------------------#")
 
 #######################################
 # Save off the old report - do not overlay
@@ -505,20 +515,6 @@ else:
     print("#####################################")
 
 logging.info("# " + os.path.basename(__file__) + " Removing CSV files downloaded.")
-
-# for table in range(len(DAILY_TBLZ)):
-
-#     DAILY_TBLZ[table] = str(new_dir + '\\' + DAILY_TBLZ[table])
-
-#     if os.path.exists( DAILY_TBLZ[table]):
-
-#         os.remove(DAILY_TBLZ[table])
-
-#     HOURLY_TBLZ[table] = str(new_dir + '\\' + HOURLY_TBLZ[table])
-
-#     if os.path.exists( HOURLY_TBLZ[table]):
-
-#         os.remove(HOURLY_TBLZ[table])
 
 logger.info("# " + os.path.basename(__file__) + " succeessful exit.")
 

@@ -40,14 +40,6 @@ logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
 
 logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-# fh = logging.FileHandler(logging_filename, mode = 'a')
-
-# fh.setLevel(logging.INFO)
-
-# fh.setFormatter(formatter)
-
-# logger.addHandler(fh)
-
 ch = logging.StreamHandler()
 
 ch.setLevel(logging.INFO)

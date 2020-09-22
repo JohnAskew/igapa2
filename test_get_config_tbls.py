@@ -33,6 +33,18 @@ class GetDF:
 
         self.which_config = which_config
 
+        my_pgm = os.path.basename(__file__)
+
+        logger = logging.getLogger()
+
+        logger.setLevel(logging.INFO)
+
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+
+        logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+
+        logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+
         logging.info("#--------------------------------------#")
 
         logging.info("# Entering " + os.path.basename(__file__))
@@ -59,6 +71,8 @@ class GetDF:
 
         config.read(path + '/' + which_config)
 
+        logging.info("# " + os.path.basename(__file__) + " reading : " + path + '/' + self.which_config )
+
         self.tbls_list = []
 
         for section in config.sections():
@@ -67,9 +81,13 @@ class GetDF:
 
                 self.tbls_list.append(config[section]['CONFIG_HOURLY_TBL'])
 
+                logging.info("# " + os.path.basename(__file__) + " returning " + config[section]['CONFIG_HOURLY_TBL'] )
+
             if config[section]['CONFIG_DAILY_TBL'] not in self.tbls_list:
 
                 self.tbls_list.append(config[section]['CONFIG_DAILY_TBL'])
+
+                logging.info("# " + os.path.basename(__file__) + " returning " + config[section]['CONFIG_DAILY_TBL'] )
 
         return self.tbls_list
 
@@ -88,6 +106,8 @@ if __name__ == '__main__':
     my_output = a.run()
 
     for table in my_output:
+
+        logging.info("# " + os.path.basename(__file__) + " calling export_cloud_to_csv.py with " + table)
 
         subr_rc = subprocess.call(["python", "./" + "export_cloud_to_csv.py", table])
 
