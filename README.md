@@ -1,7 +1,17 @@
 # igapa2
 Igapa with multi source data pull - Jira or from DB.
 
+# Usage
+## Automation - using the config files to drive connectivity.
 
+**_config.py** - holds the DB connection string parameters (db, port, user, pw, schema).
+
+**config_admin.ini** - Among other things, holds the JIRA credentials if you are extracting CSV from JIRA ticket.
+
+### Execution example:
+_pull data from database and visualize_ > python igapa.py
+
+_pull data from JIRA using ticket EXA-28727_ > python igapa.py 28727
 
 # Subroutines and Tools
 **_config.py** - Database connectivity parameters such as credentials.
