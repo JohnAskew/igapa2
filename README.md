@@ -24,6 +24,14 @@ Igapa with multi source data pull - Jira or from DB.
 
 -h:   Usage help
 
+# Quick setup of 2 configuration files.
+
+Update these appropriately for automation defaults.
+
+1. _config.py - holds the default database connection credentials. 
+
+2. config_admin.ini - First paragraph holds credentials to access our JIRA system.
+
 # Automation - using the config files to drive connectivity.
 
 **_config.py** - holds the DB connection string parameters (db, port, user, pw, schema).
