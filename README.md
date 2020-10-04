@@ -31,15 +31,15 @@ Igapa with multi source data pull - Jira or from DB.
 **config_admin.ini** - Among other things, holds the JIRA credentials if you are extracting CSV from JIRA ticket.
 
 ### Execution example:
-_Use config.py for extracting connectivity settings and visualizing_ > python igapa2.py -c <_any_config_reporting_ini_>
+_Use default config.py settings for extracting DATABASE connectivity settings and visualizing_ > python igapa2.py -c <_any_config_reporting_ini_>
 
-.The "config.py" starts with "_", as "_config.py"
-
-_Show parameters for igapa2.py_ > python igapa2.py
+.Above, the "config.py" starts with "_", as "_config.py".
 
 _download files attached to JIRA ticket EXA-28727_ and visualize> python igapa2.py  -c <_any_config_reporting_ini_>  -j 28727
 
 # Command line overrides
+
+_Show parameters for igapa2.py_ > python igapa2.py
 
 _pull database data using overrides_ > python igapa2.py -c config_report2.ini -m 192.168.1.158 -n 8563 -u sys -p secret
 
