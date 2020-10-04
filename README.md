@@ -32,9 +32,19 @@ _pull data from database using overrides_ > python igapa2.py -c <config_report2.
 
 **export_JIRA_to-csv.py** - Passed EXA- ticket and calls *subr_jira_download.py*.
 
-**subr_jira_download.py** - Passed EXA- ticket and downloads EXA- ticket attached files.
+**igapa2_linkage** - Utility to pass parameters. Included in most of the programs.
 
-**igapa_master** - Main program. This is what is execute in Python.
+**igapa_master** - Decides to call processes to Oownload JIRA files or download files from the database.
+
+**igapa2.py** _MAIN PROGRAM to execute_
+
+**igapa2_main** - Reads igapa2_linkage and calls igapa_master.py using parameters/arguments.
+
+**igapa2_validate_config_db.py** - Reads igapa2_linkage and calls igapa2_main.py using linkage parameters.
+
+**igapa2_validate_config_jira.py** - Validates the JIRA parameters and calls igapa2_main.py using linkage parameters.
+
+**subr_jira_download.py** - Passed EXA- ticket and downloads EXA- ticket attached files.
 
 **subr_char_4_rows.py** - Reads config file and builds charts.
 
@@ -45,4 +55,6 @@ _pull data from database using overrides_ > python igapa2.py -c <config_report2.
 **tools_get_table_cols.py** - Pass in table, get back table columns
 
 **tools_logger.py** - Set up logging. Imported by programs using logging.
+
+**tools_parse_config.py** - Utility to validate the configuration files used. (such as config_admin.ini, config_reports.ini, etc.)
 
