@@ -22,9 +22,9 @@ Igapa with multi source data pull - Jira or from DB.
 
 -s:   Database schema. Overrides _config.py
 
--hL   Usage help
+-h:   Usage help
 
-## Automation - using the config files to drive connectivity.
+# Automation - using the config files to drive connectivity.
 
 **_config.py** - holds the DB connection string parameters (db, port, user, pw, schema).
 
@@ -39,7 +39,11 @@ _Show parameters for igapa2.py_ > python igapa2.py
 
 _download files attached to JIRA ticket EXA-28727_ and visualize> python igapa2.py  -c <_any_config_reporting_ini_>  -j 28727
 
-_pull data using overrides_ > python igapa2.py -c <config_report2.ini> -m 192.168.1.158 -n 8563 -u sys -p secret
+# Command line overrides
+
+_pull database data using overrides_ > python igapa2.py -c config_report2.ini -m 192.168.1.158 -n 8563 -u sys -p secret
+
+_pull JIRA files attached to ticket EXA-28615 using overrides_ > python2 igapa2.py -c config_report2.ini - j 28615 -k exasol_user -l exasol_password
 
 # Subroutines and Tools
 **_config.py** - Database connectivity parameters such as credentials (Defaults for automation).
