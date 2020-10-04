@@ -58,11 +58,11 @@ def log_and_print(msg = "Error: Nothing passed to log_and_print."):
 def usage():
 #-------------------------------------
      print("######################################")
-     print("# tools_opt_get_parse parameters")
+     print("# igapa2.py parameters")
      print("######################################")
      print("# -c    Config_file override. You must specify which config to use for reporting.")
      print("#          --> The default config included is config_reports.ini.")
-     print("# -j    Jira Source. The JIRA ticket number which has the CSV attachments")
+     print("# -j    Jira Source. The JIRA ticket which has the CSV attachments. Specified as a number; leave off the EXA- prefix")
      print("# -k    Jira user. Logon credential for JIRA. Overrides config_admin.ini")
      print("# -l    Jira password. Logon credential for JIRA. Overrides config_admin.ini")
      print("# -m    Database host name or I.P. address. Overrides _config.py")
@@ -137,7 +137,7 @@ for opt,arg in opts:
     	js_in = arg
 
     elif opt == '-k':
-    	
+
     	ju_in = arg
 
     elif opt == '-c':
