@@ -87,7 +87,7 @@ if DB_Linkage.pass_host:
 
 		DB_Linkage.pass_port = config_db.port
 
-		log_and_print("No port argument, using _config.py port: " + config_db.port)
+		log_and_print("No port argument, using _config.py port: " + str(config_db.port))
 
 	if ( DB_Linkage.pass_user and DB_Linkage.pass_pw ):
 

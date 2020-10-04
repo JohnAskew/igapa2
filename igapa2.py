@@ -122,27 +122,47 @@ except getopt.GetoptError:
 	usage()
 
 for opt,arg in opts:
-	if opt == '-l':
-		jp_in = arg
-	if opt == '-j':
-		js_in = arg
-	elif opt == '-k':
-		ju_in = arg
-	elif opt == '-c':
-		config_in = arg
-	elif opt == '-m':
-		host_in = arg
-	elif opt == '-n':
-		port_in = arg
-	elif opt == '-u':
-		u_in = arg
-	elif opt == '-p':
-	    p_in = arg
-	elif opt == '-s':
-	    s_in = arg
-	elif opt == '-h':
-		usage()
-		sys.exit(0)
+    if opt == '-h':
+
+    	usage()
+
+    	sys.exit(0)
+
+    elif opt == '-l':
+
+    	jp_in = arg
+
+    elif opt == '-j':
+
+    	js_in = arg
+
+    elif opt == '-k':
+    	
+    	ju_in = arg
+
+    elif opt == '-c':
+
+    	config_in = arg
+
+    elif opt == '-m':
+
+    	host_in = arg
+
+    elif opt == '-n':
+
+    	port_in = arg
+
+    elif opt == '-u':
+
+    	u_in = arg
+
+    elif opt == '-p':
+
+    	p_in = arg
+
+    elif opt == '-s':
+
+    	s_in = arg
 
 msg = (my_pgm + " is calling igapa_linkage.py to create object X=Pass_Arguments.")
 
