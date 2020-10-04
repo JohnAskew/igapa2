@@ -9,18 +9,24 @@ Igapa with multi source data pull - Jira or from DB.
 **config_admin.ini** - Among other things, holds the JIRA credentials if you are extracting CSV from JIRA ticket.
 
 ### Execution example:
-_pull data from database and visualize_ > python igapa.py
+_Show parameters for igapa2.py_ > python igapa2.py
 
-_pull data from JIRA using ticket EXA-28727_ > python igapa.py 28727
+_pull data from JIRA using ticket EXA-28727_ > python igapa2.py  -c <_any_config_reporting_ini_>  -j 28727
+
+_pull data from _config.py connectivity settings_ > python igapa2.py -c <_any_config_reporting_ini_> 
+
+_pull data from database using overrides_ > python igapa2.py -c <config_report2.ini> -m 192.168.1.158 -n 8563 -u sys -p secret
 
 # Subroutines and Tools
-**_config.py** - Database connectivity parameters such as credentials.
+**_config.py** - Database connectivity parameters such as credentials (Defaults for automation).
 
 **config_admin.ini** - JIRA credentials, logging level and visualization properties.
 
 **config_reports.ini** - Visualization properties, which tables and columns to visualize.
 
 **config_report2.ini** - Alternative visualization properties, which tables and columns to visualize.
+
+**config_report3.ini** - Special System table alternative visualization properties, which tables and columns to visualize.
 
 **export_cloud_to_csv.py** - Creates directory of server_name (from *_config.py*) and extracts a single database table to local csv using same name.
 
