@@ -33,10 +33,20 @@ except:
 
 now = dt.today().strftime('%Y-%m-%d-%H:%M:%S')
 
-logging_filename = "igapa_master.py.log"
+logging_filename = os.path.basename(__file__)[0:(os.path.basename(__file__).index('.py'))] + '.log'
 
-logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'a', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
+#######################################
+# FUNCTION
+#######################################
 
+#--------------------------------------
+def log_and_print(msg = ''):
+#--------------------------------------
+
+    print("# " + os.path.basename(__file__) + ": " + msg)
+
+    logging.info("# " + os.path.basename(__file__) + ": " + msg)
 
 #######################################
 class ticket_validation:
@@ -48,17 +58,17 @@ class ticket_validation:
 
         self.ticket_number = ticket_number
 
-        logging.info(("#------------------------------------#"))
+        log_and_print(("#------------------------------------#"))
 
-        logging.info("# Entering " + os.path.basename(__file__) + " Class ticket_validation with ticket_number " + str(self.ticket_number))
+        log_and_print("# Entering " + os.path.basename(__file__) + " Class ticket_validation with ticket_number " + str(self.ticket_number))
 
-        logging.info(("#------------------------------------#"))
+        log_and_print(("#------------------------------------#"))
 
 #--------------------------------------
     def ticket_validate_number(self):
 #--------------------------------------
 
-        logging.info("# " + os.path.basename(__file__) + " method: ticket_validate_number with ticket_number " + str(self.ticket_number))
+        log_and_print("# " + os.path.basename(__file__) + " method: ticket_validate_number with ticket_number " + str(self.ticket_number))
 
 
         if len(str(self.ticket_number))  == 0 or __name__ == "__main__" :
@@ -105,14 +115,14 @@ class ticket_validation:
 
                     myTicket = self.ticket_number
 
-                    logging.info("# " + os.path.basename(__file__) + " validated and returning with: " + str(myTicket))
+                    log_and_print("# " + os.path.basename(__file__) + " validated and returning with: " + str(myTicket))
 
 
-                    logging.info("#-------------------------------------#")
+                    log_and_print("#-------------------------------------#")
 
-                    logging.info("# " + os.path.basename(__file__) + " successfully exited.")
+                    log_and_print("# " + os.path.basename(__file__) + " successfully exited.")
 
-                    logging.info("#-------------------------------------#")
+                    log_and_print("#-------------------------------------#")
 
                     return myTicket
 
@@ -154,9 +164,9 @@ class ticket_validation:
 
 
 
-        # logging.info(os.path.basename(__file__) + " validated and returning (exit pgm) with: " + str(myTicket))
+        # log_and_print(os.path.basename(__file__) + " validated and returning (exit pgm) with: " + str(myTicket))
 
-        # logging.info("#-------------------------------------#")
+        # log_and_print("#-------------------------------------#")
 
         # return myTicket
 
@@ -170,16 +180,16 @@ if __name__ == "__main__" :
 
     b = a.ticket_validate_number()
 
-    logging.info("# " + os.path.basename(__file__) + " executed as MAIN pgm and self processed " + str(b))
+    log_and_print("executed as MAIN pgm and self processed " + str(b))
 
     print("#######################################")
 
-    print("# " + os.path.basename(__file__) + " executed as MAIN pgm and self processed " + str(b))
+    print("executed as MAIN pgm and self processed " + str(b))
 
     print("#######################################")
 
-    logging.info(("#------------------------------------#"))
+    log_and_print(("#------------------------------------#"))
 
-    logging.info("# " + os.path.basename(__file__) + " successfully exited")
+    log_and_print("# " + os.path.basename(__file__) + " successfully exited")
 
-    logging.info(("#------------------------------------#"))
+    log_and_print(("#------------------------------------#"))

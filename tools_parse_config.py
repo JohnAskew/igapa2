@@ -56,6 +56,8 @@ now = dt.today().strftime('%Y-%m-%d-%H:%M:%S')
 
 from tools_logger import *
 
+from igapa2_linkage import *
+
 #######################################
 class ParseConfig:
 #######################################
@@ -73,13 +75,13 @@ class ParseConfig:
 
         logging.basicConfig(filename = self.logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-        logging.info("#--------------------------------------#")
+        log_and_print("#--------------------------------------#")
 
-        logging.info("# Entering " + os.path.basename(__file__))
+        log_and_print("# Entering " + os.path.basename(__file__))
 
-        logging.info("#--------------------------------------#")
+        log_and_print("#--------------------------------------#")
 
-        logging.info("# " + os.path.basename(__file__) + " Class ParseConfig received section heading: " + self.myconfig + " using this config file: " + self.which_config)
+        log_and_print("Class ParseConfig received section heading: " + self.myconfig + " using this config file: " + self.which_config)
 
 #-------------------------------------#
     def __repr__(self):
@@ -97,9 +99,11 @@ class ParseConfig:
 
         self.config_admin = config_admin
 
-        logging.info("# " + os.path.basename(__file__) + " section read_config_admin_admin path: " + self.path + " using this config file: " + self.config_admin)
+        log_and_print("#-------------------------------------#")
 
-        print("# INFO:", os.path.basename(__file__), "section read_config_admin_admin path:", self.path, "using this config file:", self.config_admin)
+        log_and_print("# Entering: read_config_admin_admin with path: " + self.path + " using this config file: " + self.config_admin)
+
+        log_and_print("#-------------------------------------#")
 
         config = configparser.ConfigParser()
 
@@ -190,7 +194,7 @@ class ParseConfig:
 
             print("You are logging in as user:", user)
 
-            logging.info("# " + os.path.basename(__file__) + " Interactively received Jira user: " + user)
+            log_and_print("# " + os.path.basename(__file__) + " Interactively received Jira user: " + user)
 
             passwd  = getpass.getpass(prompt='Enter password, it will NOT be displayed ')
 
@@ -200,7 +204,7 @@ class ParseConfig:
 
         m.update(b)
 
-        logging.info("# " + os.path.basename(__file__) + " is successfully returning user " + user + ' and encrypted passwd ' + str(m.hexdigest()))
+        log_and_print(" is successfully returning user " + user + ' and encrypted passwd ' + str(m.hexdigest()))
 
         return (user, passwd)
 
@@ -419,45 +423,23 @@ class ParseConfig:
 
         if len(y) == 0:
 
-            logging.error("#######################################")
+            log_and_print("#######################################")
 
-            logging.error("# " + os.path.basename(__file__))
+            log_and_print("# " + os.path.basename(__file__))
 
-            logging.error("# config file " + self.which_config + " not found or is not readable.")
+            log_and_print("# config file " + self.which_config + " not found or is not readable.")
 
-            logging.error("# This program was looking for config file: " + x)
+            log_and_print("# This program was looking for config file: " + x)
 
-            logging.error("# Ensure ini files exists in this directory: " +  save_dir)
+            log_and_print("# Ensure ini files exists in this directory: " +  save_dir)
 
-            logging.error("# ---> Does " +  self.which_config + " exist?")
+            log_and_print("# ---> Does " +  self.which_config + " exist?")
 
-            logging.error("# ---> Is " +  self.which_config + " a readable file?")
+            log_and_print("# ---> Is " +  self.which_config + " a readable file?")
 
-            logging.error("# Aborting with no action taken.")
+            log_and_print("# Aborting with no action taken.")
 
-            logging.error("#######################################")
-
-            print("#######################################")
-
-            print("# FATAL:", os.path.basename(__file__))
-
-            print("#", self.which_config, "not found or is not readable.")
-
-            print("# This program was looking for:", x)
-
-            print("#")
-
-            print("# Ensure ini files exists in this directory:", save_dir)
-
-            print("# ---> Does", self.which_config, "exist?")
-
-            print("# ---> Is", self.which_config, "a readable file?")
-
-            #print("# Here is the output from attempted config file read:", y)
-
-            print("# Aborting with no action taken.")
-
-            print("#######################################")
+            log_and_print("#######################################")
 
             sys.exit(-1)
 
@@ -468,9 +450,7 @@ class ParseConfig:
 
             for item in z:
 
-                logging.info("# " + os.path.basename(__file__) + " found " + self.which_config + " with these sections: " +  item)
-
-            print("# INFO:", os.path.basename(__file__),"found " + self.which_config  + " with these sections:", z)
+                log_and_print("found " + self.which_config + " with these sections: " +  item)
 
             return z
 
@@ -568,15 +548,17 @@ class ParseConfig:
 
                 pass_fail = False
 
-        print("#######################################")
+        log_and_print()
 
         if not pass_fail:
 
             quit(0)
-                  
-        logging.info("# " + os.path.basename(__file__) + " successfully exit.")
 
-        logging.info(("#--------------------------------------#"))
+        log_and_print("#--------------------------------------#")
+                  
+        log_and_print(" successfully exit.")
+
+        log_and_print("#--------------------------------------#")
 
         return config[myConfig]['CONFIG_HOURLY_TBL'] \
         ,config[myConfig]['CONFIG_DAILY_TBL']        \
@@ -594,31 +576,47 @@ class ParseConfig:
         ,config[myConfig]['CONFIG_ROW4_COL_Y_AXIS_2']     
 
 #######################################
+# FUNCTIONS
+#######################################
+#--------------------------------------
+def log_and_print(msg = ""):
+
+    print("# " + os.path.basename(__file__) + ": " + msg)
+
+    logging.info("# " + os.path.basename(__file__) + ": " + msg)
+
+#######################################
 # M A I N   L O G I C
 #######################################
+
+
+
 if __name__ == '__main__':
 
-    print("#######################################")
-
-    print("# INFO:", os.path.basename(__file__))
-
-    print("# --> is accessing ParseConfig with ParseConfig('DB_SIZE', 'config_reports.ini'")
+    log_and_print("--> is accessing ParseConfig with ParseConfig('DB_SIZE', 'config_reports.ini'")
 
     a = ParseConfig('DB_SIZE', 'config_reports.ini')
 
-    print("# INFO: __repr__ on a: " + repr(a))
+    log_and_print(" __repr__ on a: " + repr(a))
 
     user, passwd  = a.read_config_admin_admin('.', 'config_admin.ini')
 
-    print("# INFO: config_admin.ini has section ADMIN user", user, "password", passwd)
+    log_and_print("config_admin.ini has section ADMIN user: " + user +  " password: <secret>")
 
     legend_font_size, legend_location, plotWidth, plotHeight, smallplotWidth, smallplotHeight, largeplotWidth, largeplotHeight = a.read_config_admin_layout('.', 'config_admin.ini')
 
-    print("# INFO: config_admin.ini has section MASTER-LAYOUT with", legend_font_size, legend_location, plotWidth, plotHeight, smallplotWidth, smallplotHeight, largeplotWidth, largeplotHeight)
+    log_and_print("config_admin.ini has section MASTER-LAYOUT with " + legend_font_size 
+                                                                     + " " + legend_location
+                                                                     + " " + plotWidth
+                                                                     + " " + plotHeight
+                                                                     + " " + smallplotWidth 
+                                                                     + " " + smallplotHeight
+                                                                     + " " + largeplotWidth 
+                                                                     + " " + largeplotHeight)
 
     log_level, outlier_threshold, reports_hourly, reports_daily = a.read_config_admin_reporting('.', 'config_admin.ini')
 
-    print("# INFO: config_admin.ini has section REPORTING with " + str(log_level) + 
+    log_and_print("config_admin.ini has section REPORTING with " + str(log_level) + 
                                     " AND outlier_threshold of " + outlier_threshold +
                                     " reports_hourly "       + reports_hourly + 
                                     " reports_daily  "       + reports_daily)
@@ -630,9 +628,11 @@ if __name__ == '__main__':
 
     print("==> Returning:", CONFIG_ROW1_HOURLY_TBL, CONFIG_ROW1_DAILY_TBL, CONFIG_ROW1_COL_X_AXIS, CONFIG_ROW1_COL_Y_AXIS_1, CONFIG_ROW1_COL_Y_AXIS_2, CONFIG_ROW2_COL_X_AXIS, CONFIG_ROW2_COL_Y_AXIS_1, CONFIG_ROW2_COL_Y_AXIS_2, CONFIG_ROW3_COL_X_AXIS, CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2, CONFIG_ROW4_COL_X_AXIS, CONFIG_ROW4_COL_Y_AXIS_1, CONFIG_ROW4_COL_Y_AXIS_2)
 
-    logging.info("# " + os.path.basename(__file__) + " successfully exit.")
+    log_and_print("#--------------------------------------#")
+    
+    log_and_print(" successfully exit.")
 
-    logging.info("#--------------------------------------#")
+    log_and_print("#--------------------------------------#")
 
 
 

@@ -28,73 +28,43 @@ except:
 
 now = dt.today().strftime('%Y-%m-%d-%H:%M:%S')
 
-my_pgm = os.path.basename(__file__)
-
-logger = logging.getLogger()
-
-logger.setLevel(logging.INFO)
-
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-logging_filename = my_pgm[0:(my_pgm.index('.py'))] + '.log'
+logging_filename = os.path.basename(__file__)[0:(os.path.basename(__file__).index('.py'))] + '.log'
 
 logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 'w', format='%(asctime)s - %(levelname)s - %(lineno)d - %(message)s')
 
-ch = logging.StreamHandler()
+#######################################
+# FUNCTIONS (out of place but I nee to log and print errors)
+#######################################
+#--------------------------------------
+def log_and_print(msg = ''):
 
-ch.setLevel(logging.INFO)
+    print("# " + os.path.basename(__file__) + ": " + msg)
 
-ch.setFormatter(formatter)
+    logging.info("# " + os.path.basename(__file__) + ": " + msg)
 
-logger.addHandler(ch)
-
-
-
-
-logger.info("#--------------------------------------#")
-
-logger.info("# Entering " + os.path.basename(__file__))
-
-logger.info(("#--------------------------------------#"))
-
+########################################
+# CONTINUE SETTIN UP
+########################################
 try:
 
     from subr_validate_ticket import ticket_validation
 
 except:
 
-    logger.error("########################################")
+    log_and_print("########################################")
 
-    logger.error("# Error: " + os.path.basename(__file__))
+    log_and_print("# Error: " + os.path.basename(__file__))
 
-    logger.error("# program subr_validate_ticket.py not found")
+    log_and_print("# program subr_validate_ticket.py not found")
 
-    logger.error("# so we are unable to validate the ticket.")
+    log_and_print("# so we are unable to validate the ticket.")
 
-    logger.error("# Aborting with no action taken...")
+    log_and_print("# Aborting with no action taken...")
 
-    logger.error("########################################")
+    log_and_print("########################################")
 
-    print()
-
-    print("########################################")
-
-    print("# Error:")
-
-    print("#")
-
-    print("# program subr_validate_ticket.py not found")
-
-    print("# so we are unable to validate the ticket.")
-
-    print("#")
-
-    print("# Aborting with no action taken...")
-
-    print("########################################")
-
-    print()
-    
     sys.exit(13)
 
 try:
@@ -155,62 +125,63 @@ except:
     
     msg = "Unable to find tools_parse_config.py"
 
-    logger.error("#######################################")
+    log_and_print("#######################################")
 
-    logger.error("# ERROR in " +  os.path.basename(__file__))
+    log_and_print("# ERROR in " +  os.path.basename(__file__))
     
-    logger.error("# " + msg)
+    log_and_print("# " + msg)
 
-    logger.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
+    log_and_print("# " +  os.path.basename(__file__) + " aborting with no action taken.")
 
-    logger.error("#######################################")
-
-    print("#######################################")
-
-    print("# ERROR in", os.path.basename(__file__))
-    
-    print(msg)
-
-    print("#", os.path.basename(__file__), "aborting with no action taken.")
-
-    print("#######################################")
+    log_and_print("#######################################")
 
     sys.exit(13)
 
 
+#######################################
+# MAIN LOGIC
+#######################################
 
-#----------------------------------------------------------------Variables
+log_and_print("#--------------------------------------#")
 
-if __name__ == "__main__":
+log_and_print("# Entering " + os.path.basename(__file__))
 
-    if len(sys.argv) > 1:
+log_and_print(("#--------------------------------------#"))
 
-        in_ticket = sys.argv[1]
+from igapa2_linkage import *
 
-        logger.info("# " + os.path.basename(__file__) + " read in parameter in_ticket: " + str(in_ticket))
+if len(sys.argv) == 1:
 
-    else:
-       
-        in_ticket = 28615
+    pass_jira_source = 28615
 
-        logger.info("# " + os.path.basename(__file__) + " read in parameter in_ticket: " + str(in_ticket))
+    log_and_print("Using DEFAULT (testing) pass_jira_source: " + str(pass_jira_source))
+
 else:
 
-    in_ticket = sys.argv[1]
+    msg = ("received igapa2_linkage: " + pass_config + ", " + pass_jira_source + ", " +  pass_jira_user + ", " + " <secret> " +  pass_host + ", " + pass_port + ", " + pass_user + ", " + pass_pw + ", " + pass_schema)
 
-    logger.info("# " + os.path.basename(__file__) + " read in parameter in_ticket: " + str(in_ticket))
+log_and_print(msg)
+ 
+log_and_print()
 
-print("#####################################")
+log_and_print("#####################################")
 
-print("# INFO:", os.path.basename(__file__), "received ticket", str(in_ticket))
+log_and_print("# Entering  with  ticket " + str(pass_jira_source))
 
-print("#####################################")
+log_and_print("#####################################")
+
+log_and_print()
 
 now = dt.today().strftime('%Y%m%d-%H%M%S')
 
-a = ticket_validation(in_ticket)
+log_and_print("Calling subr_validate_ticket.py with : " + str(pass_jira_source))
+
+a = ticket_validation(pass_jira_source)
 
 myTicket= a.ticket_validate_number() # Your ticket: EXA-1234x
+
+log_and_print("created myTicket as : " + str(myTicket))
+
 
 work_ticket = 0
 
@@ -256,27 +227,41 @@ except Exception as e:
 
     sys.exit(13)
 
-user, pasw = b.read_config_admin_admin('.', 'config_admin.ini')
+if pass_jira_source:
 
-logger.info("# " + os.path.basename(__file__) + " using JIRA credentials for user " + user)
+    if (( pass_jira_user ) and (pass_jira_pw)):
 
-print("#######################################")
+        user = pass_jira_user
 
-print("# INFO:", os.path.basename(__file__),"using JIRA credentials for user", user)
+        pasw = pass_jira_pw
 
-print("#######################################")
+    else:
+
+        user, pasw = b.read_config_admin_admin('.', 'config_admin.ini')
+
+else:
+
+    user, pasw = b.read_config_admin_admin('.', 'config_admin.ini')
+
+log_and_print("#--------------------------------------")
+
+log_and_print("using JIRA credentials for user " + user)
+
+log_and_print("#--------------------------------------")
+
+print()
 
 jiraURL = 'https://www.exasol.com/support/rest/api/2/issue/EXA-'
 
 attachment_final_url="" # To validate if there are or not attachments
 
-logger.info("# " + os.path.basename(__file__) + " processing ticket for myTicket: " + str(myTicket))
+log_and_print("#--------------------------------------")
 
-print("#--------------------------------------#")
+log_and_print("processing ticket for myTicket: " + str(myTicket) + " --> Will be converted to EXA-" + str(myTicket))
 
-print("INFO:", os.path.basename(__file__), "processing ticket for", myTicket)
+log_and_print("#--------------------------------------#")
 
-print("---------------------------------------#")
+print()
 
 save_dir = os.getcwd()
 
@@ -289,37 +274,25 @@ def main() :
 
     try:
         
-        logger.info("# " + os.path.basename(__file__) + " making URL Call: " + jiraURL + myTicket)
+        log_and_print("making URL Call: " + jiraURL + myTicket)
 
         r = requests.get(jiraURL+myTicket, auth=(user, pasw),timeout=5)
 
     except Exception as e:
 
-        logger.error("#####################################")
+        log_and_print("#####################################")
 
-        logger.error("# Error " + os.path.basename(__file__))
+        log_and_print("# Error ")
 
-        logger.error("# " + os.path.basename(__file__) + " Unable to find ticket " +  str(myTicket))
+        log_and_print("Unable to find ticket " +  str(myTicket))
 
-        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        log_and_print("Aborting with no action taken.")
 
-        logger.error(e, exc_info = True)
+        log_and_print("#####################################")
 
-        logger.error("#####################################")
+        log_and_print(e, exc_info = True)
 
-        print("#####################################")
 
-        print("# Error " + os.path.basename(__file__))
-
-        print("# " + os.path.basename(__file__) + " Unable to find ticket", myTicket)
-
-        print("# " + os.path.basename(__file__) + " Aborting with no action taken.")
-
-        print("#")
-
-        print("#####################################")
-
-        print(e)
 
         sys.exit(13)
 
@@ -335,8 +308,6 @@ def main() :
 # Create new directory same as ticket
 #-------------------------------------#
 
-        print("#######################################")
-
         if os.path.exists(work_ticket):
 
             try:
@@ -345,44 +316,24 @@ def main() :
 
                 os.rename(work_ticket, dest_dir )
 
-                logger.info("# " + os.path.basename(__file__) + " renaming " + str(work_ticket) + " to " + dest_dir)
-
-                print("# INFO:", os.path.basename(__file__), " renaming", work_ticket, "to ", dest_dir)
-
-
+                log_and_print("renaming " + str(work_ticket) + " to " + dest_dir)
 
             except:
 
-                logger.warning("#-------------------------------------#")
+                logging.info("#-------------------------------------#")
 
-                logger.warning("# WARNING: " +  os.path.basename(__file__) + " unable to rename")
+                logging.info("# WARNING: " +  os.path.basename(__file__) + " unable to rename")
 
-                logger.warning("# from: " +  str(work_ticket) +  " to " +  dest_dir)
+                logging.info("# from: " +  str(work_ticket) +  " to " +  dest_dir)
 
-                logger.warning("#-------------------------------------#")
+                logging.info("#-------------------------------------#")
 
-                print("#######################################")
-
-                print("# WARNING:")
-
-                print("#", os.path.basename(__file__), " unable to rename")
-
-                print("# from:", work_ticket, "to", dest_dir)
-
-                print("#######################################")
-
-
-
-
+     
         work_dir = os.path.join(save_dir, work_ticket)
 
         os.mkdir(work_ticket)
 
-        logger.info("# " + os.path.basename(__file__) + " saving work in: " + work_dir)
-
-        print("# INFO:", os.path.basename(__file__), "saving work in:", work_dir)
-
-        print("#######################################")
+        log_and_print("saving work in: " + work_dir)
 
         #######################################
         # C H A N G I N G    D I R E C T O R Y
@@ -392,35 +343,21 @@ def main() :
 
     else:
 
-        logger.error("#####################################")
+        log_and_print("#####################################")
 
-        logger.error("# " + os.path.basename(__file__) + " Error: accessing JIRA with return code: " + str(rstatus))
+        log_and_print("Error: accessing JIRA with return code: " + str(rstatus))
 
-        logger.error("# " + os.path.basename(__file__) + " Unable to process ticket " +  work_ticket)
+        log_and_print("Unable to process ticket " +  work_ticket)
 
-        logger.error("# ---> Does ticket " + work_ticket + " even exist?")
+        log_and_print("# ---> Does ticket " + work_ticket + " even exist?")
 
-        logger.error("# ---> For ticket " + work_ticket + " Do you have access permission on JIRA?")
+        log_and_print("# ---> For ticket " + work_ticket + " Do you have access permission on JIRA?")
 
-        logger.error("# " + os.path.basename(__file__) + " had URL read return code: " + str(rstatus))
+        log_and_print("had URL read return code: " + str(rstatus))
 
-        logger.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        log_and_print("Aborting with no action taken.")
 
-        logger.error("#####################################")
-
-        print("#####################################")
-
-        print("# " + os.path.basename(__file__) + " Error: accessing JIRA with return code:" + str(rstatus))
-
-        print("# " + os.path.basename(__file__) + " Unable to process ticket", work_ticket)
-
-        print("# ---> Does ticket " + work_ticket + " even exist?")
-
-        print("# ---> For ticket " + work_ticket + " Do you have access permission on JIRA?")
-
-        print("# " + os.path.basename(__file__) + " Aborting with no action taken.")
-
-        print("#####################################")
+        log_and_print("#####################################")
 
         sys.exit(13)
 
@@ -430,31 +367,21 @@ def main() :
 
         attachment_final_url=""
 
-        logger.warning("#####################################")
+        log_and_print()
 
-        logger.warning("# " + os.path.basename(__file__) + " WARNING")
+        log_and_print("#####################################")
 
-        logger.warning("#  No Attachments found for " +  work_ticket)
+        log_and_print("# " + os.path.basename(__file__) + " WARNING")
 
-        logger.warning("# The folder " +  work_ticket, "will be empty")
+        log_and_print("#  No Attachments found for " +  work_ticket)
 
-        logger.warning("# and no reports will be run")
+        log_and_print("# The folder " +  work_ticket, "will be empty")
 
-        logger.warning("#####################################")
+        log_and_print("# and no reports will be run")
 
-        print("#####################################")
+        log_and_print("#####################################")
 
-        print("# WARNING")
-
-        print("#")
-
-        print("# No Attachments found for", work_ticket)
-
-        print("# The folder", work_ticket, "will be empty")
-
-        print("# and no reports will be run")
-
-        print("#####################################")
+        log_and_print()
 
         sys.exit(13)
 
@@ -468,10 +395,8 @@ def main() :
             
              status_attachment_name = 'OK: The desired attachment exists: ' + attachment_filename
             
-             logger.info("# " + os.path.basename(__file__) + " trying to download " + attachment_final_url)
+             log_and_print("trying to download " + attachment_final_url)
 
-             print(attachment_final_url)
-            
              attachment_name = False
             
              attachment_amount = False
@@ -501,8 +426,8 @@ if __name__ == "__main__" :
 
     main() 
 
-logger.info("#-------------------------------------#")
+log_and_print("#-------------------------------------#")
 
-logger.info("# " + os.path.basename(__file__) + " successfully exited")
+log_and_print("successfully exited")
 
-logger.info("#-------------------------------------#")
+log_and_print("#-------------------------------------#")

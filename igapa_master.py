@@ -117,7 +117,7 @@ except:
 
     sys.exit(13)
 
-
+from igapa2_linkage import *
 
 
 #######################################
@@ -130,9 +130,9 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 new_dir =""
 
-global in_ticket
+global pass_jira_source
 
-in_ticket = ""
+pass_jira_source = ""
 
 class_chart = 'DB_SIZE'
 
@@ -161,7 +161,7 @@ logging.basicConfig(filename = logging_filename, level=logging.INFO, filemode = 
 
 logging.info("#####################################")
 
-msg_info = "# Starting " + os.path.basename(__file__)
+msg_info = "Entering" + os.path.basename(__file__)
 
 logging.info(msg_info)
 
@@ -176,34 +176,32 @@ except:
     
     msg = "Unable to find tools_parse_config.py"
 
-    logging.error("#######################################")
+    log_and_print("#######################################")
 
-    logging.error("# ERROR in " +  os.path.basename(__file__))
+    log_and_print("# ERROR in " +  os.path.basename(__file__))
     
-    logging.error("# " + msg)
+    log_and_print("# " + msg)
 
-    logging.error("# " +  os.path.basename(__file__) + " aborting with no action taken.")
+    log_and_print("# " +  os.path.basename(__file__) + " aborting with no action taken.")
 
-    logging.error("#######################################")
-
-    print("#######################################")
-
-    print("# ERROR in", os.path.basename(__file__))
-    
-    print(msg)
-
-    print("#", os.path.basename(__file__), "aborting with no action taken.")
-
-    print("#######################################")
+    log_and_print("#######################################")
 
     sys.exit(13)
 
+#######################################
+# FUNCTIONS
+#######################################
+#--------------------------------------
+def log_and_print(msg = ''):
+#--------------------------------------
+    print("# " + os.path.basename(__file__) + ": " + msg)
 
+    logging.info("# " + os.path.basename(__file__) + ": " + msg)
 #--------------------------------------
 # Get admin configurations
 #--------------------------------------
 
-logging.info("# " + my_pgm + " calling tools_parse_config")
+log_and_print("calling tools_parse_config")
 
 try:
 
@@ -211,71 +209,62 @@ try:
 
 except Exception as e:
     
-    print("#######################################")
+    log_and_print("#######################################")
 
-    print("# WARNING" + os.path.basename(__file__) )
+    log_and_print("# WARNING" + os.path.basename(__file__) )
 
-    print("#-------------------------------------#")
+    log_and_print("#-------------------------------------#")
 
-    print("# Unable to read config_admin.ini section REPORTING to get log_level")
+    log_and_print("# Unable to read config_admin.ini section REPORTING to get log_level")
 
-    print("# Using defaults:")
+    log_and_print("# Using defaults:")
 
-    print("# ===> " + os.path.basename(__file__) + " using log_level of WARNING")
+    log_and_print("# ===> " + os.path.basename(__file__) + " using log_level of WARNING")
 
-    print(e)
+    log_and_print(e)
 
 try:
 
     log_level, outlier_threshold, reports_hourly, reports_daily = b.read_config_admin_reporting('.', 'config_admin.ini')
 
-    print("# " + os.path.basename(__file__) + " REPORTING variables log_level " + log_level )
+    log_and_print("REPORTING variables log_level " + log_level )
 
 
 except Exception as e:
 
-    print("#------------------------------------#")
+    log_and_print("#------------------------------------#")
 
-    print("WARNING: " + os.path.basename(__file__) + " in directory " + os.getcwd())
+    log_and_print("WARNING: " + os.path.basename(__file__) + " in directory " + os.getcwd())
 
-    print("#------------------------------------#")
+    log_and_print("#------------------------------------#")
 
-    print("# " + os.path.basename(__file__) + " unable to reference REPORTING section of config_admin.ini")
+    log_and_print( " unable to reference REPORTING section of config_admin.ini")
 
-    print("# Using defaults:")
+    log_and_print("# Using defaults:")
 
-    print("# ==> log_level " + log_level)
+    log_and_print("# ==> log_level " + log_level)
 
-    print(e)
-
-# log_level = "WARNING"
+    log_and_print(e)
 
 ######################################
 # START LOGIC for MAIN
 ######################################
+
+from igapa2_linkage import *
+
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
 
-        config_in = 'config_reports.ini'
+        pass_config = 'config_reports.ini'
 
-        in_ticket = ''
-
-        new_dir = (config_db.dsn)
-
-    elif len(sys.argv) == 2 :
-
-        config_in = sys.argv[1]
+        pass_jira_source = ''
 
         new_dir = (config_db.dsn)
 
-    elif len(sys.argv) > 2:
+    else:
 
-        config_in = sys.argv[1]
-
-        in_ticket = sys.argv[2]
-
-        new_dir = str("EXA-" + str(in_ticket))
+        new_dir = DB_Linkage.pass_host
 
 
 #######################################
@@ -286,110 +275,118 @@ if __name__ == "__main__":
 
 work_dir = os.getcwd()
 
-filename = str(os.getcwd() + '\\' + config_in)
+filename = str(os.getcwd() + '\\' + pass_config)
 
 if os.path.exists(filename):
 
-    logging.info("# " + os.path.basename(__file__) + " was given config file " + config_in)
+    log_and_print("was given config file " + pass_config)
 
 else:
 
-    logging.error("#####################################")
+    log_and_print("#####################################")
 
-    logging.error("# " + os.path.basename(__file__)) 
+    log_and_print("# " + os.path.basename(__file__)) 
 
-    logging.error("# " + os.path.basename(__file__) + " Could not find config file: " + config_in)
+    log_and_print("Could not find config file: " + pass_config)
 
-    logging.error("# " + os.path.basename(__file__) + " Ensure " + config_in + " exists in this directory: " + os.getcwd())
+    log_and_print("Ensure " + pass_config + " exists in this directory: " + os.getcwd())
 
-    logging.error("# ---> Does " + config_in + " exist?")
+    log_and_print("# ---> Does " + pass_config + " exist?")
 
-    logging.error("# ---> Is "  + config_in + " a readable file?")
+    log_and_print("# ---> Is "  + pass_config + " a readable file?")
 
-    logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken")
+    log_and_print("Aborting with no action taken")
 
-    logging.error("#####################################")
+    log_and_print("#####################################")
 
-    print("#####################################")
-
-    print("# " + os.path.basename(__file__)) 
-
-    print("# Could not find config file: " + config_in)
-
-    print("# Ensure " + config_in + " exists in this directory: " + os.getcwd())
-
-    print("# ---> Does " + config_in + " exist?")
-
-    print("# ---> Is "  + config_in + " a readable file?")
-
-    print("# " + os.path.basename(__file__) + " Aborting with no action taken")
-
-    print("#####################################")
-
+    
     sys.exit(0)
 
+if len(sys.argv) ==1:
 
-if len(str(in_ticket)) > 3:
+    log_and_print("was not passed any parameters linkage. Using config files to drive processing.")
 
-    msg_info = "# " + os.path.basename(__file__) + " is calling jira_download.py with " + str(in_ticket)
+else:
 
-    logging.info(msg_info)
+    # for arg  in range(len(sys.argv)):
 
-    print("# INFO:", os.path.basename(__file__))
+    #     log_and_print(my_pgm + " received parm " + str(sys.argv[arg]))
 
-    print("# is calling jira_download.py with", str(in_ticket))
+    pass
 
-    print("#####################################")
+if len(str(pass_jira_source)) > 3:
 
-    print()
+    msg_info = "is calling jira_download.py with " + str(pass_jira_source)
 
-    msg_info = "# Executing call " + dir_path + '\\' + "subr_jira_download.py " + str(in_ticket)
+    log_and_print(msg_info)
 
-    logging.info(msg_info)
+    msg_info = "Executing call " + dir_path + '\\' + "subr_jira_download.py " + str(pass_jira_source)
 
+    log_and_print(msg_info)
 
-    subr_rc = subprocess.call(["python", dir_path + "/" + "subr_jira_download.py", str(in_ticket)])
+    subr_rc = subprocess.call(["python", dir_path + "/" + "subr_jira_download.py", pass_config, pass_jira_source, pass_jira_user, pass_jira_pw, pass_host, pass_port, pass_user, pass_pw, pass_schema])
 
     if subr_rc != 0:
 
-        logging.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from subr_jira_download.py")
+        log_and_print("#####################################")
 
-        logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        log_and_print( "received return code " + str(subr_rc) + " from subr_jira_download.py")
 
-        print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from subr_jira_download.py")
+        log_and_print( "Aborting with no action taken.")
 
-        print("#####################################")
+        log_and_print("#####################################")
 
         sys.exit(-1)
 
 else:
 
-    msg_info = "# Executing call " + dir_path + '\\' + "test_get_config_tbls.py " 
+    msg_info = ("Executing call to test_get_config_tbls.py with DB_Linkage.pass_host: "
+                                                     + DB_Linkage.pass_host
+                                                     + " DB_Linkage.pass_port: "
+                                                     + DB_Linkage.pass_port
+                                                     + " DB_Linkage.pass_user: "
+                                                     + DB_Linkage.pass_user
+                                                     + " DB_Linkage.pass_pw: "
+                                                     + "<secret>"
+                                                     + " DB_Linkage.pass_schema: "
+                                                     + DB_Linkage.pass_schema
+                                                     )
 
-    logging.info(msg_info)
+    log_and_print(msg_info)
 
-    subr_rc = subprocess.call(["python", dir_path + "/" + "test_get_config_tbls.py"])
+    subr_rc = subprocess.call(["python", dir_path + "/" + "test_get_config_tbls.py"
+                                                         , DB_Linkage.pass_config
+                                                         , JIRA_Linkage.pass_jira_source
+                                                         , JIRA_Linkage.pass_jira_user
+                                                         , JIRA_Linkage.pass_jira_pw
+                                                         , DB_Linkage.pass_host
+                                                         , DB_Linkage.pass_port
+                                                         , DB_Linkage.pass_user
+                                                         , DB_Linkage.pass_pw
+                                                         , DB_Linkage.pass_schema
+                                                          ])
 
     if subr_rc != 0:
 
-        logging.error("# " + os.path.basename(__file__) + " received return code " + str(subr_rc) + " from test_get_config_tbls.py")
+        log_and_print("####################################")
 
-        logging.error("# " + os.path.basename(__file__) + " Aborting with no action taken.")
+        log_and_print( "ERROR: received return code " + str(subr_rc) + " from test_get_config_tbls.py")
 
-        print("# " + os.path.basename(__file__) + " Aborting after receiving subr_rc:" + str(subr_rc) + " from test_get_config_tbls.py")
+        log_and_print( " Aborting with no action taken.")
 
-        print("#####################################")
+        log_and_print("####################################")
 
         sys.exit(-1)
 
 
 config = configparser.ConfigParser()
 
-config.read(os.getcwd() + '/' + config_in)
+config.read(os.getcwd() + '/' + pass_config)
 
 DAILY_TBLZ = []
 
 HOURLY_TBLZ = []
+
 
 for section in config.sections():
 
@@ -407,91 +404,119 @@ for table in range(len(DAILY_TBLZ)):
 
     DAILY_TBLZ[table] = str(DAILY_TBLZ[table] + '.csv')
 
+    log_and_print("DAILY_TBLZ after CSV conversion " + DAILY_TBLZ[table])
+
+
+
 for table in range(len(HOURLY_TBLZ)):
 
     HOURLY_TBLZ[table] = str(HOURLY_TBLZ[table] + '.csv')
 
-print(my_pgm + ": HOURLY_TBLZ after CSV conversion", HOURLY_TBLZ)
-print(my_pgm + ": DAILY_TBLZ after CSV conversion", DAILY_TBLZ)
+    log_and_print("HOURLY_TBLZ after CSV conversion " + HOURLY_TBLZ[table])
 
 #os.chdir(dir_path)
 
-msg_info = "# " + os.path.basename(__file__) + " processing igapa pgms in directory " + os.getcwd()
+msg_info = "processing igapa pgms in directory " + os.getcwd()
 
-logging.info(msg_info)
+log_and_print(msg_info)
 
-print()
+log_and_print("#---------------------------------------")
 
-print(msg_info)
+log_and_print("DIRECTORY " + dir_path + ", using SUB-DIRECTORY : " + new_dir) 
 
-print()
+log_and_print("#---------------------------------------")
 
-if (os.path.exists(new_dir + '\\' + DAILY_TBLZ[0])  and (os.path.exists(new_dir + '\\' + HOURLY_TBLZ[0]))) : 
 
-    if len(in_ticket) > 3:
+if pass_host:
 
-        msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + str(new_dir)  + " " + str(config_in)
+    new_dir = pass_host
 
-        logging.info(msg_info)
+elif pass_jira_source:
 
-        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(new_dir), str(config_in)])
-
-    else:
-
-        msg_info = "# " + os.path.basename(__file__) + " calling python " + dir_path + "\\" + "subr_chart_4_rows.py " + config_db.dsn  + " " + str(config_in)
-
-        logging.info(msg_info)
-
-        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(config_db.dsn), str(config_in)])
-
+    new_dir = str("EXA-" + str(pass_jira_source))
 
 else:
 
-    print("#####################################")
+    log_and_print("Using configdb.dsn as new_dir: " + config_db.dsn)
 
-    msg_info = "#####################################"
+    new_dir = config_db.dsn
 
-    logger.warning(msg_info)
+if os.path.exists(new_dir):
 
-    logger.warning("# ===> Check other logs for ERRORS! <=== ")
+    pass
 
-    logger.warning("# ===> Check other logs for ERRORS! <=== ")
+else:
 
-    logger.warning("# ===> Check other logs for ERRORS! <=== ")
- 
-    msg_info = "# WARNING: " + os.path.basename(__file__)
+    os.mkdir(new_dir)
 
-    logger.warning(msg_info)
+if len(HOURLY_TBLZ) > 0:
 
-    logger.warning("# processed ticket:\t " +  new_dir)
+    log_and_print("Here is the HOURLY Table: " + new_dir + '\\' + HOURLY_TBLZ[0])
 
-    logger.warning("# BUT did not find any usable CSV files for")
+    if len(DAILY_TBLZ) > 0:
 
-    logger.warning("# generating charts. Ending processing without any charts.")
+        log_and_print("Here is the DAILY Table: " +new_dir + '\\' + DAILY_TBLZ[0])
+else:
 
-    logger.warning("#")
+    log_and_print("#####################################")
 
-    logger.warning("# This solution is looking for: ")
+    log_and_print("# ERROR: Unable to access either: " + new_dir + "\\ DAILY_TABLE OR "  + new_dir + '\\HOURLY_TABLE')
 
-    logger.warning("# " +  str(new_dir + '\\' + DAILY_TBLZ[0]) + " and " +  str(new_dir + '\\' + HOURLY_TBLZ[0]) )
+    log_and_print("aborting!")
 
-    logger.warning("#####################################")
+    log_and_print("#####################################")
 
-    print("# WARNING:", os.path.basename(__file__))
+    sys.exit(12)
 
-    print("# processed ticket:\t", new_dir)
 
-    print("# BUT did not find any usable CSV files for")
+test_dir = (os.path.exists(new_dir + '\\' + DAILY_TBLZ[0]))
 
-    print("# generating charts. Ending processing without any charts.")
 
-    print("#")
+if os.path.exists(test_dir):
 
-    print("# This solution is looking for: ")
+    log_and_print("Confirming HOURLY Table: " +new_dir + '\\' + HOURLY_TBLZ[0] )
 
-    print("#", str(new_dir + '\\' + DAILY_TBLZ[0]), "and", str(new_dir + '\\' + HOURLY_TBLZ[0]) )
+    log_and_print("Confirming DAILY Table: " +new_dir + '\\' + DAILY_TBLZ[0] )
 
-    print("#####################################")
+    test_dir = (os.path.exists(new_dir + '\\' + HOURLY_TBLZ[0]))
+
+    if os.path.exists(test_dir): 
+
+        msg_info = ("calling python subr_chart_4_rows.py with host: " + str(new_dir)  + "  and config: " + str(pass_config))
+
+        log_and_print(msg_info)
+
+        subr_rc = subprocess.call(["python", dir_path + "/" + "subr_chart_4_rows.py", str(new_dir), str(pass_config)])
+
+    else:
+
+        msg_info = "#####################################"
+
+        log_and_print(msg_info)
+
+        log_and_print("# ===> Check other logs for ERRORS! <=== ")
+
+        log_and_print("# ===> Check other logs for ERRORS! <=== ")
+
+        log_and_print("# ===> Check other logs for ERRORS! <=== ")
+     
+        msg_info = "# WARNING: " + os.path.basename(__file__)
+
+        log_and_print(msg_info)
+
+        log_and_print("# processed ticket:\t " +  new_dir)
+
+        log_and_print("# BUT did not find any usable CSV files for")
+
+        log_and_print("# generating charts. Ending processing without any charts.")
+
+        log_and_print("#")
+
+        log_and_print("# This solution is looking for: ")
+
+        log_and_print("# " +  str(new_dir + '\\' + DAILY_TBLZ[0]) + " and " +  str(new_dir + '\\' + HOURLY_TBLZ[0]) )
+
+        log_and_print("#####################################")
 
 logging.info("#####################################")
 
