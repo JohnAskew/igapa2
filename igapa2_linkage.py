@@ -238,6 +238,8 @@ else:
 
 	pass_schema      = ''
 
+X = Pass_Arguments(pass_config, pass_jira_source, pass_jira_user, pass_jira_pw,pass_host, pass_port, pass_user, pass_pw, pass_schema)
+
 JIRA_Linkage = Class_JIRA(pass_config, pass_jira_source, pass_jira_user, pass_jira_pw)
 
 DB_Linkage =   Class_DB(pass_config, pass_host, pass_port, pass_user, pass_pw, pass_schema)

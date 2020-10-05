@@ -170,17 +170,27 @@ log_and_print(msg)
 
 X = Pass_Arguments(config_in, js_in, ju_in, jp_in, host_in, port_in, u_in, p_in, s_in)
 
-msg = (my_pgm + "--> is passing igapa_linkage.py CONFIG parameter " +  X.pass_config)
+msg = ("--> is passing igapa_linkage.py CONFIG parameter " +  X.pass_config)
 
 log_and_print(msg)
 
-msg = (my_pgm + "--> is passing igapa_linkage.py JIRA parameters JIRA_ticket " +  X.pass_jira_source + ", " + " JIRA _user " + X.pass_jira_user + ", " + " JIRA_pw <secret>" )
+if X.pass_jira_source:
+	
+	msg = ("--> is passing igapa_linkage.py JIRA parameters JIRA_ticket " +  X.pass_jira_source + ", " + " JIRA _user " + X.pass_jira_user + ", " + " JIRA_pw <secret>" )
 
-log_and_print(msg)
+	log_and_print(msg)
 
-msg = (my_pgm + "--> is passing igapa_linkage.py DB Connect parameters Host: " + X.pass_host + ", User: " + X.pass_user + ", Password: <secret> " + ", Schema: " + X.pass_schema)
+elif X.pass_host:
+	
+	msg = ("--> is passing igapa_linkage.py DB Connect parameters Host: " + X.pass_host + ", User: " + X.pass_user + ", Password: <secret> " + ", Schema: " + X.pass_schema)
 
-log_and_print(msg)
+	log_and_print(msg) 
+
+else:
+
+    msg = ("--> Using default _config_py.py settings to process the database and credentials. See program export_cloud_to_csv.py for processing")
+    
+    log_and_print(msg) 
 
 log_and_print("#-------------------------------------")
 
@@ -204,13 +214,17 @@ if X.pass_config:
 
 else:
 
-	log_and_print("#######################################")
-
-	log_and_print("ERROR: Parameters found but missing -c parameter which is required. Aborting with no action taben.")
+	msg = ("ERROR: Parameters found but missing -c parameter which is required. Aborting with no action taben.")
 
 	log_and_print("#######################################")
 
-	sys.exit(12)
+	log_and_print(msg)
+
+	log_and_print("Aborting with unsuccessful exit.")
+
+	log_and_print("#######################################")
+
+	assert(X.pass_config), msg
 
 
 if X.pass_jira_source:
@@ -284,6 +298,6 @@ if subr_rc != 0:
 
 log_and_print("######################################")
 
-log_and_print("Sucessfully exitting.")
+log_and_print("Successfully exiting.")
 
 log_and_print("######################################")

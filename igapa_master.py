@@ -264,8 +264,13 @@ if __name__ == "__main__":
 
     else:
 
-        new_dir = DB_Linkage.pass_host
+        if pass_jira_source:
 
+            new_dir = JIRA_Linkage.pass_jira_source
+
+        else:
+
+            new_dir = DB_Linkage.pass_host
 
 #######################################
 #######################################
@@ -427,13 +432,13 @@ log_and_print("DIRECTORY " + dir_path + ", using SUB-DIRECTORY : " + new_dir)
 log_and_print("#---------------------------------------")
 
 
-if pass_host:
-
-    new_dir = pass_host
-
-elif pass_jira_source:
+if pass_jira_source:
 
     new_dir = str("EXA-" + str(pass_jira_source))
+
+elif pass_host:
+
+    new_dir = pass_host
 
 else:
 
