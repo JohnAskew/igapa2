@@ -460,6 +460,10 @@ CONFIG_ROW3_COL_Y_AXIS_2 = False
 CONFIG_ROW4_COL_X_AXIS   = False
 CONFIG_ROW4_COL_Y_AXIS_1 = False
 CONFIG_ROW4_COL_Y_AXIS_2 = False
+COLS_TBL1 = False
+COLS_TBL2 = False
+COLS_TBL3 = False
+COLS_TBL4 = False
 
 
 #######################################
@@ -478,7 +482,9 @@ os.chdir(in_ticket)
 
 for config_section in config_sections:
 
-    process_section = ParseConfig(config_section, config_in)
+    print("config_section: " + config_section + " config_in" + config_in)
+
+    process_section = ParseConfig(config_section, config_in) 
 
     CONFIG_HOURLY_TBL,CONFIG_DAILY_TBL,CONFIG_ROW1_COL_X_AXIS,CONFIG_ROW1_COL_Y_AXIS_1,CONFIG_ROW1_COL_Y_AXIS_2,CONFIG_ROW2_COL_X_AXIS,CONFIG_ROW2_COL_Y_AXIS_1,CONFIG_ROW2_COL_Y_AXIS_2,CONFIG_ROW3_COL_X_AXIS,CONFIG_ROW3_COL_Y_AXIS_1,CONFIG_ROW3_COL_Y_AXIS_2,CONFIG_ROW4_COL_X_AXIS,CONFIG_ROW4_COL_Y_AXIS_1,CONFIG_ROW4_COL_Y_AXIS_2 = process_section.run(save_dir)
 
@@ -560,6 +566,7 @@ for config_section in config_sections:
     log_and_print("About to process TABLES in dir " + currPath)
 
     log_and_print()
+
 
 ###############################################################################
 #   #######   #     ####    #      ######  ##
@@ -786,87 +793,89 @@ for config_section in config_sections:
     ###############################################################################
 
 
-    #######################################bbb
+    #######################################
     # Extract TBL2 Hourly Records
     #######################################
 
-    try:
+    if COLS_TBL2:
 
-        df_hourly_full_tbl_2 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL2)
+        try:
 
-        df_hourly_full_tbl_2_extracted = df_hourly_full_tbl_2.shape[0]
+            df_hourly_full_tbl_2 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL2)
 
-
-    except Exception as e:
-
-        log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + "...Aborting with no action taken.")
-
-        logging.error(e, exc_info = True)
-
-        print(e)
-
-        sys.exit(13)
-
-    #######################################
-    # Extract TBL2 Daily Records
-    #######################################
-
-    try:
-
-        df_daily_full_tbl_2 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL2)
-
-        df_daily_full_tbl_2_extracted =  df_daily_full_tbl_2.shape[0]
+            df_hourly_full_tbl_2_extracted = df_hourly_full_tbl_2.shape[0]
 
 
-    except Exception as e:
+        except Exception as e:
 
-        log_and_print("Unable to READ " + CONFIG_DAILY_TBL + " ...Aborting with no action taken.")
+            log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + "...Aborting with no action taken.")
 
-        logging.error(3)
+            logging.error(e, exc_info = True)
 
-        print(e)
+            print(e)
 
-        sys.exit(13)
+            sys.exit(13)
 
-    #######################################
-    #  Set CONFIG_ROW1_COL_X_AXIS as timestamp for Hourly full tbl 2
-    #######################################
+        #######################################
+        # Extract TBL2 Daily Records
+        #######################################
 
-    df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS])
+        try:
 
-    #######################################
-    # For TBL2 Hourly Table - read past 5 days
-    #######################################   
+            df_daily_full_tbl_2 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL2)
 
-    date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
-
-    df_hourly_work_tbl_2 = pd.DataFrame(df_hourly_full_tbl_2, columns = COLS_TBL2).copy(deep = True)
+            df_daily_full_tbl_2_extracted =  df_daily_full_tbl_2.shape[0]
 
 
+        except Exception as e:
 
-    df_hourly_work_tbl_2.reset_index(inplace = True, drop = True)
+            log_and_print("Unable to READ " + CONFIG_DAILY_TBL + " ...Aborting with no action taken.")
 
-    df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS])
+            logging.error(3)
 
-    mask = (df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+            print(e)
 
-    df_hourly_7_day_tbl_2 = df_hourly_work_tbl_2.loc[mask].copy(deep = True) 
+            sys.exit(13)
 
-    #######################################
-    # For TBL2 Daily Table - read past 30 days
-    #######################################   
+        #######################################
+        #  Set CONFIG_ROW1_COL_X_AXIS as timestamp for Hourly full tbl 2
+        #######################################
 
-    date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+        df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS])
 
-    df_daily_work_tbl_2 = pd.DataFrame(df_daily_full_tbl_2, columns = COLS_TBL2).copy(deep = True)
+        #######################################
+        # For TBL2 Hourly Table - read past 5 days
+        #######################################   
 
-    df_daily_work_tbl_2.reset_index(inplace = True, drop = True)
+        date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
 
-    df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS])
+        df_hourly_work_tbl_2 = pd.DataFrame(df_hourly_full_tbl_2, columns = COLS_TBL2).copy(deep = True)
 
-    mask = (df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
 
-    df_daily_30_day_tbl_2 = df_daily_work_tbl_2.loc[mask].copy(deep = True)
+
+        df_hourly_work_tbl_2.reset_index(inplace = True, drop = True)
+
+        df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_hourly_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+
+        df_hourly_7_day_tbl_2 = df_hourly_work_tbl_2.loc[mask].copy(deep = True) 
+
+        #######################################
+        # For TBL2 Daily Table - read past 30 days
+        #######################################   
+
+        date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+
+        df_daily_work_tbl_2 = pd.DataFrame(df_daily_full_tbl_2, columns = COLS_TBL2).copy(deep = True)
+
+        df_daily_work_tbl_2.reset_index(inplace = True, drop = True)
+
+        df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_daily_work_tbl_2[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
+
+        df_daily_30_day_tbl_2 = df_daily_work_tbl_2.loc[mask].copy(deep = True)
 
     ###############################################################################
     #   #######   #     ####    #      ######  ####
@@ -880,91 +889,93 @@ for config_section in config_sections:
     # Extract TBL3 Hourly Records
     #######################################
 
-    try:
+    if COLS_TBL3:
 
-        df_hourly_full_tbl_3 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL3)
+        try:
 
-        df_hourly_full_tbl_3_extracted = df_hourly_full_tbl_3.shape[0]
+            df_hourly_full_tbl_3 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL3)
 
-
-    except Exception as e:
-
-        log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + " ...Aborting with no action taken.")
-
-        logging.error(e, exc_info = True)
-
-        print(e)
-
-        sys.exit(13)
-
-    #######################################
-    # Extract TBL3 Daily Records
-    #######################################
-
-    try:
-
-        df_daily_full_tbl_3 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL3)#  export_params={"columns": COLS_TBL3}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
-
-        df_daily_full_tbl_3_extracted = df_daily_full_tbl_3.shape[0]
+            df_hourly_full_tbl_3_extracted = df_hourly_full_tbl_3.shape[0]
 
 
-    except Exception as e:
+        except Exception as e:
 
-        log_and_print("Unable to READ " + CONFIG_DAILY_TBL + " ...Aborting with no action taken.")
+            log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + " ...Aborting with no action taken.")
 
-        logging.error(e, exc_info = True)
+            logging.error(e, exc_info = True)
 
-        print(e)
+            print(e)
 
-        sys.exit(13)
+            sys.exit(13)
 
-    #######################################
-    # Read the max df_hourly_full_tbl_3 timestamp
-    #######################################
+        #######################################
+        # Extract TBL3 Daily Records
+        #######################################
 
-    df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS])
+        try:
 
-    date_max_hourly = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS].max()
+            df_daily_full_tbl_3 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL3)#  export_params={"columns": COLS_TBL3}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
 
-    #######################################
-    # Read the max df_daily_full_tbl_3 timestamp
-    #######################################
+            df_daily_full_tbl_3_extracted = df_daily_full_tbl_3.shape[0]
 
-    df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS])
 
-    date_max_daily = df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS].max()
+        except Exception as e:
 
-    #######################################
-    # For TBL3 Hourly Table - read past 5 days
-    #######################################   
+            log_and_print("Unable to READ " + CONFIG_DAILY_TBL + "(3) ...Aborting with no action taken.")
 
-    date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
+            logging.error(e, exc_info = True)
 
-    df_hourly_work_tbl_3 = pd.DataFrame(df_hourly_full_tbl_3, columns = COLS_TBL3).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
+            print(e)
 
-    df_hourly_work_tbl_3.reset_index(inplace = True, drop = True)
+            sys.exit(13)
 
-    df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS])
+        #######################################
+        # Read the max df_hourly_full_tbl_3 timestamp
+        #######################################
 
-    mask = (df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+        df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS])
 
-    df_hourly_7_day_tbl_3 = df_hourly_work_tbl_3.loc[mask].copy(deep = True)
+        date_max_hourly = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS].max()
 
-    #######################################
-    # For TBL3 Daily Table - read past 30 days
-    #######################################   
+        #######################################
+        # Read the max df_daily_full_tbl_3 timestamp
+        #######################################
 
-    date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+        df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS])
 
-    df_daily_work_tbl_3 = pd.DataFrame(df_daily_full_tbl_3, columns = COLS_TBL3).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
+        date_max_daily = df_daily_full_tbl_3[CONFIG_ROW1_COL_X_AXIS].max()
 
-    df_daily_work_tbl_3.reset_index(inplace = True, drop = True)
+        #######################################
+        # For TBL3 Hourly Table - read past 5 days
+        #######################################   
 
-    df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS])
+        date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
 
-    mask = (df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
+        df_hourly_work_tbl_3 = pd.DataFrame(df_hourly_full_tbl_3, columns = COLS_TBL3).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
 
-    df_daily_30_day_tbl_3 = df_daily_work_tbl_3.loc[mask].copy(deep = True)
+        df_hourly_work_tbl_3.reset_index(inplace = True, drop = True)
+
+        df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_hourly_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+
+        df_hourly_7_day_tbl_3 = df_hourly_work_tbl_3.loc[mask].copy(deep = True)
+
+        #######################################
+        # For TBL3 Daily Table - read past 30 days
+        #######################################   
+
+        date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+
+        df_daily_work_tbl_3 = pd.DataFrame(df_daily_full_tbl_3, columns = COLS_TBL3).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
+
+        df_daily_work_tbl_3.reset_index(inplace = True, drop = True)
+
+        df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_daily_work_tbl_3[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
+
+        df_daily_30_day_tbl_3 = df_daily_work_tbl_3.loc[mask].copy(deep = True)
 
     ###############################################################################
     #   #######   #     ####    #      ######    #
@@ -979,82 +990,84 @@ for config_section in config_sections:
     # Extract TBL4 Hourly Records
     #######################################
 
-    try:
+    if COLS_TBL4:
 
-        df_hourly_full_tbl_4 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL4)#  export_params={"columns": COLS_TBL4}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
+        try:
 
-        df_hourly_full_tbl_4_extracted = df_hourly_full_tbl_4.shape[0]
+            df_hourly_full_tbl_4 = pd.read_csv(CONFIG_HOURLY_TBL + '.csv', usecols = COLS_TBL4)#  export_params={"columns": COLS_TBL4}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
 
-
-    except Exception as e:
-
-        log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + " ...Aborting with no action taken.")
-
-        logging.error(e, exc_info = True)
-
-        print(e)
-
-        sys.exit(13)
-
-    #######################################
-    # Extract TBL4 Daily Records
-    #######################################
-
-    try:
-
-        df_daily_full_tbl_4 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL4)#  export_params={"columns": COLS_TBL4}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
-
-        df_daily_full_tbl_4_extracted = df_daily_full_tbl_4.shape[0]
+            df_hourly_full_tbl_4_extracted = df_hourly_full_tbl_4.shape[0]
 
 
-    except Exception as e:
+        except Exception as e:
 
-        log_and_print("Unable to READ " + CONFIG_DAILY_TBL + " ...Aborting with no action taken.")
+            log_and_print("Unable to READ " + CONFIG_HOURLY_TBL + " ...Aborting with no action taken.")
 
-        logging.error(e, exc_info = True)
+            logging.error(e, exc_info = True)
 
-        print(e)
+            print(e)
 
-        sys.exit(13)
+            sys.exit(13)
 
-    #######################################
-    #  Set CONFIG_ROW1_COL_X_AXIS as timestamp for Hourly full tbl 2
-    #######################################
+        #######################################
+        # Extract TBL4 Daily Records
+        #######################################
 
-    df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS])
+        try:
 
-    #######################################
-    # For TBL4 Hourly Table - read past 5 days
-    #######################################   
+            df_daily_full_tbl_4 = pd.read_csv(CONFIG_DAILY_TBL + '.csv', usecols = COLS_TBL4)#  export_params={"columns": COLS_TBL4}) #["INTERVAL_START",CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2]})
 
-    date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
-
-    df_hourly_work_tbl_4 = pd.DataFrame(df_hourly_full_tbl_4, columns = COLS_TBL4).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
+            df_daily_full_tbl_4_extracted = df_daily_full_tbl_4.shape[0]
 
 
-    df_hourly_work_tbl_4.reset_index(inplace = True, drop = True)
+        except Exception as e:
 
-    df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS])
+            log_and_print("Unable to READ " + CONFIG_DAILY_TBL + " ...Aborting with no action taken.")
 
-    mask = (df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+            logging.error(e, exc_info = True)
 
-    df_hourly_7_day_tbl_4 = df_hourly_work_tbl_4.loc[mask].copy(deep = True) 
+            print(e)
 
-    #######################################
-    # For TBL4 Daily Table - read past 30 days
-    #######################################   
+            sys.exit(13)
 
-    date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+        #######################################
+        #  Set CONFIG_ROW1_COL_X_AXIS as timestamp for Hourly full tbl 2
+        #######################################
 
-    df_daily_work_tbl_4 = pd.DataFrame(df_daily_full_tbl_4, columns = COLS_TBL4).copy(deep = True)
+        df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS])
 
-    df_daily_work_tbl_4.reset_index(inplace = True, drop = True)
+        #######################################
+        # For TBL4 Hourly Table - read past 5 days
+        #######################################   
 
-    df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS])
+        date_reports_hourly_ago = date_max_hourly - timedelta(hours= reports_hourly)
 
-    mask = (df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
+        df_hourly_work_tbl_4 = pd.DataFrame(df_hourly_full_tbl_4, columns = COLS_TBL4).copy(deep = True) #["INTERVAL_START", CONFIG_ROW3_COL_Y_AXIS_1, CONFIG_ROW3_COL_Y_AXIS_2])
 
-    df_daily_30_day_tbl_4 = df_daily_work_tbl_4.loc[mask].copy(deep = True)
+
+        df_hourly_work_tbl_4.reset_index(inplace = True, drop = True)
+
+        df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_hourly_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] >  date_reports_hourly_ago )
+
+        df_hourly_7_day_tbl_4 = df_hourly_work_tbl_4.loc[mask].copy(deep = True) 
+
+        #######################################
+        # For TBL4 Daily Table - read past 30 days
+        #######################################   
+
+        date_reports_daily_ago = date_max_daily - timedelta(days = reports_daily)
+
+        df_daily_work_tbl_4 = pd.DataFrame(df_daily_full_tbl_4, columns = COLS_TBL4).copy(deep = True)
+
+        df_daily_work_tbl_4.reset_index(inplace = True, drop = True)
+
+        df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] = pd.to_datetime(df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS])
+
+        mask = (df_daily_work_tbl_4[CONFIG_ROW1_COL_X_AXIS] >  date_reports_daily_ago )
+
+        df_daily_30_day_tbl_4 = df_daily_work_tbl_4.loc[mask].copy(deep = True)
 
 #######################################
 # DATA CLEAN UP  - Charts Row 1 Set NULLS To 0.
@@ -1088,85 +1101,90 @@ for config_section in config_sections:
 # DATA CLEAN UP  - Charts Row 2 Set NULLS To 0.
 #######################################
 
-    df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
+    if COLS_TBL2:
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
+
+            df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].fillna(0, inplace = True)
 
 #######################################
 # DATA CLEAN UP  - Charts Row 3 Set NULLS To 0.
 #######################################
+    if COLS_TBL3:
 
-    df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
+        df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-        df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
+            df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
+        df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-        df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
+            df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
+        df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-        df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
+            df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
+        df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-        df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
+            df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].fillna(0, inplace = True)
 
 #######################################
 # DATA CLEAN UP  - Charts Row 4 Set NULLS To 0.
 #######################################
 
-    df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
+    if COLS_TBL4:
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
+            df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].fillna(0, inplace = True)
 
-        df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
+
+            df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].fillna(0, inplace = True)
 
 
 
@@ -1215,121 +1233,127 @@ for config_section in config_sections:
     # Convert Hourly full TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
     ###############################################################################
 
-    df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
+    if COLS_TBL2:
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
 
-        df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Hourly 5 day TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
 
-    df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Hourly 5 day TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
 
-         df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily full TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+             df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
 
-    df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily full TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
 
-        df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily 30 day TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_daily_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
 
-    df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily 30 day TBL2 CONFIG_ROW2_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW2_COL_Y_AXIS_2:
+        df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1] = df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1].astype(float)
 
-        df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW2_COL_Y_AXIS_2:
+
+            df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2] = df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2].astype(float)
 
     ###############################################################################
     # Convert Hourly full TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
     ###############################################################################
 
-    df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
+    if COLS_TBL3:
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
 
-        df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Hourly 5 day TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
 
-    df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Hourly 5 day TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
 
-        df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily full TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
 
-    df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily full TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
 
-        df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW3_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily 30 day TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_daily_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
 
-    df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily 30 day TBL3 CONFIG_ROW3_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW3_COL_Y_AXIS_2:
+        df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1] = df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1].astype(float)
 
-        df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW3_COL_Y_AXIS_2:
+
+            df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2] = df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2].astype(float)
 
     ###############################################################################
     # Convert Hourly full TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
     ###############################################################################
 
-    df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
+    if COLS_TBL4:
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
 
-        df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Hourly 5 day TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
 
-    df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Hourly 5 day TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
 
-        df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily full TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
 
-    df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily full TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
 
-        df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
 
-    ###############################################################################
-    # Convert Daily 30 day TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
-    ###############################################################################
+            df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_daily_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
 
-    df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
+        ###############################################################################
+        # Convert Daily 30 day TBL4 CONFIG_ROW4_COL_Y_AXIS_1 / _2 to float
+        ###############################################################################
 
-    if CONFIG_ROW4_COL_Y_AXIS_2:
+        df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1] = df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1].astype(float)
 
-        df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
+        if CONFIG_ROW4_COL_Y_AXIS_2:
+
+            df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2] = df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2].astype(float)
 
     ###############################################################################
     # #         # #########  ####### #       # 
@@ -1379,7 +1403,7 @@ for config_section in config_sections:
 
     line1_tbl1_hourly_7_day.legend.label_text_font_size = legend_font_size
 
-    line1_tbl1_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
+    line1_tbl1_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
 
 #######################################
 # Calculate the BEST_FIT line against _MAX
@@ -1487,7 +1511,7 @@ for config_section in config_sections:
 
     line1_tbl1_daily.legend.label_text_font_size = legend_font_size
 
-    line1_tbl1_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
+    line1_tbl1_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
 
 
 #######################################
@@ -1631,192 +1655,194 @@ for config_section in config_sections:
     # Visualize Hourly Past  5 Day Data
     #######################################
 
-    line2_tbl2_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+    if COLS_TBL2:
 
-    line2_tbl2_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
+        line2_tbl2_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
 
-    line2_tbl2_hourly_7_day.title.align = "center"
+        line2_tbl2_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
 
-    line2_tbl2_hourly_7_day.title.text_color = "white"
+        line2_tbl2_hourly_7_day.title.align = "center"
 
-    line2_tbl2_hourly_7_day.title.text_font_size = "15px"
+        line2_tbl2_hourly_7_day.title.text_color = "white"
 
-    line2_tbl2_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
+        line2_tbl2_hourly_7_day.title.text_font_size = "15px"
 
-    line2_tbl2_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_2, legend_label = ('HOURLY ' + CONFIG_ROW2_COL_Y_AXIS_2) )
+        line2_tbl2_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
 
-    line2_tbl2_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_2, legend_label = ("HOURLY"  + CONFIG_ROW2_COL_Y_AXIS_1))
-    
-    line2_tbl2_hourly_7_day.legend.location = legend_location
+        line2_tbl2_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_2, legend_label = ('HOURLY ' + CONFIG_ROW2_COL_Y_AXIS_2) )
 
-    line2_tbl2_hourly_7_day.legend.label_text_font_size = legend_font_size
+        line2_tbl2_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_2, legend_label = ("HOURLY"  + CONFIG_ROW2_COL_Y_AXIS_1))
+        
+        line2_tbl2_hourly_7_day.legend.location = legend_location
 
-    line2_tbl2_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
+        line2_tbl2_hourly_7_day.legend.label_text_font_size = legend_font_size
 
-#######################################
-# Calculate the BEST_FIT line against _MAX
-#######################################
-
-    int_list = []
-
-    for mydate in df_hourly_7_day_tbl_2[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line2_tbl2_hourly_7_day.line(df_hourly_7_day_tbl_2[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW2_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-
-    my_mean = np.mean(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
-
-    my_std  = np.std(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
-
-    for count, i in enumerate(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2]):
-
-        if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-
-            line2_tbl2_hourly_7_day.circle( x=df_hourly_7_day_tbl_2.iloc[count:count+1,0], y = df_hourly_7_day_tbl_2.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW2_COL_Y_AXIS_2 + " Outlier")
-
-   
-
+        line2_tbl2_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000")
 
     #######################################
-    # Visualized
+    # Calculate the BEST_FIT line against _MAX
     #######################################
 
+        int_list = []
+
+        for mydate in df_hourly_7_day_tbl_2[CONFIG_ROW1_COL_X_AXIS]:
+
+            int_list.append(date_to_seconds(mydate))
+
+            int_list = sorted(int_list)
+
+        xs = np.array(int_list, dtype = float)
+
+        ys = np.array(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], dtype = float)
+
+        m, b = best_fit(xs, ys)
+
+        regression_line = [ (m * x) + b  for x in xs]
+
+        line2_tbl2_hourly_7_day.line(df_hourly_7_day_tbl_2[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW2_COL_Y_AXIS_2)
+
     #######################################
-    # Visualize Daily Data
+    # Calculate the OUTLIERS
     #######################################
 
 
-    line2_tbl2_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+        my_mean = np.mean(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
 
-    line2_tbl2_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
+        my_std  = np.std(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
 
-    line2_tbl2_daily.title.align = "center"
+        for count, i in enumerate(df_hourly_7_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2]):
 
-    line2_tbl2_daily.title.text_color = "white"
+            if ( ( i - my_mean ) / my_std ) > outlier_threshold:
 
-    line2_tbl2_daily.title.text_font_size = "15px"
+                line2_tbl2_hourly_7_day.circle( x=df_hourly_7_day_tbl_2.iloc[count:count+1,0], y = df_hourly_7_day_tbl_2.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW2_COL_Y_AXIS_2 + " Outlier")
 
-    line2_tbl2_daily.title.background_fill_color = "darkblue"##aaaaee"
-
-    line2_tbl2_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW2_COL_Y_AXIS_2 , alpha = 0.5, color=("red"),  source=df_daily_30_day_tbl_2, legend_label = ('DAILY ' + CONFIG_ROW2_COL_Y_AXIS_2))#, legend = "db_tbl_2_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
-
-    line2_tbl2_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_1 , alpha = 0.5, color=("blue"), source=df_daily_30_day_tbl_2, legend_label = ("DAILY " + CONFIG_ROW2_COL_Y_AXIS_1))#, legend = ["db_tbl_2_SIZE_AVG","db_tbl_2_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
-
-    line2_tbl2_daily.legend.location = legend_location
-
-    line2_tbl2_daily.legend.label_text_font_size = legend_font_size
-
-    line2_tbl2_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
-
-    #######################################
-# Calculate the BEST_FIT line against _MAX
-# Left in for purposes of using at a later date
-# so do not delete out the this commented section
-# of code.
-#######################################
-
-    int_list = []
-
-    for mydate in df_daily_30_day_tbl_2[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line2_tbl2_daily.line(df_daily_30_day_tbl_2[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW2_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-    # my_mean = np.mean(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
-
-    # my_std  = np.std(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
-
-    # for count, i in enumerate(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2]):
-
-    #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-            
-    #         line2_tbl2_daily.circle( x=df_daily_30_day_tbl_2.iloc[count:count+1,0], y = df_daily_30_day_tbl_2.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW2_COL_Y_AXIS_2 + " Outlier")
+       
 
 
+        #######################################
+        # Visualized
+        #######################################
+
+        #######################################
+        # Visualize Daily Data
+        #######################################
 
 
-    #######################################
-    # Visualize Entire Data
+        line2_tbl2_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+
+        line2_tbl2_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
+
+        line2_tbl2_daily.title.align = "center"
+
+        line2_tbl2_daily.title.text_color = "white"
+
+        line2_tbl2_daily.title.text_font_size = "15px"
+
+        line2_tbl2_daily.title.background_fill_color = "darkblue"##aaaaee"
+
+        line2_tbl2_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW2_COL_Y_AXIS_2 , alpha = 0.5, color=("red"),  source=df_daily_30_day_tbl_2, legend_label = ('DAILY ' + CONFIG_ROW2_COL_Y_AXIS_2))#, legend = "db_tbl_2_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
+
+        line2_tbl2_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW2_COL_Y_AXIS_1 , alpha = 0.5, color=("blue"), source=df_daily_30_day_tbl_2, legend_label = ("DAILY " + CONFIG_ROW2_COL_Y_AXIS_1))#, legend = ["db_tbl_2_SIZE_AVG","db_tbl_2_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
+
+        line2_tbl2_daily.legend.location = legend_location
+
+        line2_tbl2_daily.legend.label_text_font_size = legend_font_size
+
+        line2_tbl2_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
+
+        #######################################
+    # Calculate the BEST_FIT line against _MAX
+    # Left in for purposes of using at a later date
+    # so do not delete out the this commented section
+    # of code.
     #######################################
 
-    vbar_tbl2_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_1[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
-                                       y1 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
-                                       y2 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])) #, #LIST_RAW_SIZE_MAX, 
-                                       #label = [CONFIG_ROW2_COL_Y_AXIS_1, CONFIG_ROW2_COL_Y_AXIS_2]))
+        int_list = []
+
+        for mydate in df_daily_30_day_tbl_2[CONFIG_ROW1_COL_X_AXIS]:
+
+            int_list.append(date_to_seconds(mydate))
+
+            int_list = sorted(int_list)
+
+        xs = np.array(int_list, dtype = float)
+
+        ys = np.array(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], dtype = float)
+
+        m, b = best_fit(xs, ys)
+
+        regression_line = [ (m * x) + b  for x in xs]
+
+        line2_tbl2_daily.line(df_daily_30_day_tbl_2[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW2_COL_Y_AXIS_2)
+
+    #######################################
+    # Calculate the OUTLIERS
+    #######################################
+
+        # my_mean = np.mean(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
+
+        # my_std  = np.std(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])
+
+        # for count, i in enumerate(df_daily_30_day_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2]):
+
+        #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
+                
+        #         line2_tbl2_daily.circle( x=df_daily_30_day_tbl_2.iloc[count:count+1,0], y = df_daily_30_day_tbl_2.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW2_COL_Y_AXIS_2 + " Outlier")
 
 
-    vbar_tbl2_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
-
-    vbar_tbl2_tot_col1.title.text = (CONFIG_HOURLY_TBL)
-
-    vbar_tbl2_tot_col1.title.align = "center"
-
-    vbar_tbl2_tot_col1.title.text_color = "yellow"
-
-    vbar_tbl2_tot_col1.title.text_font_size = "15px"
-
-    vbar_tbl2_tot_col1.title.background_fill_color = "darkblue"
-
-    vbar_tbl2_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl2_source, legend_label = CONFIG_ROW2_COL_Y_AXIS_1)
-
-    vbar_tbl2_tot_col1.legend.location = legend_location
-
-    vbar_tbl2_tot_col1.legend.label_text_font_size = legend_font_size
 
 
-    varea_tbl2_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
-                                       y1 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
-                                       y2 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
-                                       ))
+        #######################################
+        # Visualize Entire Data
+        #######################################
 
-    vbar_tbl2_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+        vbar_tbl2_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_1[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
+                                           y1 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
+                                           y2 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2])) #, #LIST_RAW_SIZE_MAX, 
+                                           #label = [CONFIG_ROW2_COL_Y_AXIS_1, CONFIG_ROW2_COL_Y_AXIS_2]))
 
-    vbar_tbl2_tot_col2.title.text = (CONFIG_HOURLY_TBL)
 
-    vbar_tbl2_tot_col2.title.align = "center"
+        vbar_tbl2_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
 
-    vbar_tbl2_tot_col2.title.text_color = "yellow"
+        vbar_tbl2_tot_col1.title.text = (CONFIG_HOURLY_TBL)
 
-    vbar_tbl2_tot_col2.title.text_font_size = "15px"
+        vbar_tbl2_tot_col1.title.align = "center"
 
-    vbar_tbl2_tot_col2.title.background_fill_color = "darkblue"
+        vbar_tbl2_tot_col1.title.text_color = "yellow"
 
-    vbar_tbl2_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl2_stack_source, legend_label = CONFIG_ROW2_COL_Y_AXIS_2)
+        vbar_tbl2_tot_col1.title.text_font_size = "15px"
 
-    vbar_tbl2_tot_col2.legend.location = legend_location
+        vbar_tbl2_tot_col1.title.background_fill_color = "darkblue"
 
-    vbar_tbl2_tot_col2.legend.label_text_font_size = legend_font_size
+        vbar_tbl2_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl2_source, legend_label = CONFIG_ROW2_COL_Y_AXIS_1)
+
+        vbar_tbl2_tot_col1.legend.location = legend_location
+
+        vbar_tbl2_tot_col1.legend.label_text_font_size = legend_font_size
+
+
+        varea_tbl2_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_2[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
+                                           y1 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
+                                           y2 = df_hourly_full_tbl_2[CONFIG_ROW2_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
+                                           ))
+
+        vbar_tbl2_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+
+        vbar_tbl2_tot_col2.title.text = (CONFIG_HOURLY_TBL)
+
+        vbar_tbl2_tot_col2.title.align = "center"
+
+        vbar_tbl2_tot_col2.title.text_color = "yellow"
+
+        vbar_tbl2_tot_col2.title.text_font_size = "15px"
+
+        vbar_tbl2_tot_col2.title.background_fill_color = "darkblue"
+
+        vbar_tbl2_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl2_stack_source, legend_label = CONFIG_ROW2_COL_Y_AXIS_2)
+
+        vbar_tbl2_tot_col2.legend.location = legend_location
+
+        vbar_tbl2_tot_col2.legend.label_text_font_size = legend_font_size
 
 
     ###############################################################################
@@ -1827,196 +1853,197 @@ for config_section in config_sections:
     #      #    #    #  ####    #####  ###### #####
     ###############################################################################
 
+    if COLS_TBL3:
 
     #######################################
     # Visualize Hourly Past  5 Day Data
     #######################################
 
-    line3_tbl3_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+        line3_tbl3_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
 
-    line3_tbl3_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
+        line3_tbl3_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
 
-    line3_tbl3_hourly_7_day.title.align = "center"
+        line3_tbl3_hourly_7_day.title.align = "center"
 
-    line3_tbl3_hourly_7_day.title.text_color = "white"
+        line3_tbl3_hourly_7_day.title.text_color = "white"
 
-    line3_tbl3_hourly_7_day.title.text_font_size = "15px"
+        line3_tbl3_hourly_7_day.title.text_font_size = "15px"
 
-    line3_tbl3_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
+        line3_tbl3_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
 
-    line3_tbl3_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_3, legend_label = ('HOURLY ' + CONFIG_ROW3_COL_Y_AXIS_2) )
+        line3_tbl3_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_3, legend_label = ('HOURLY ' + CONFIG_ROW3_COL_Y_AXIS_2) )
 
-    line3_tbl3_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_3, legend_label = ("HOURLY"  + CONFIG_ROW3_COL_Y_AXIS_1))
-    
-    line3_tbl3_hourly_7_day.legend.location = legend_location
+        line3_tbl3_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_3, legend_label = ("HOURLY"  + CONFIG_ROW3_COL_Y_AXIS_1))
+        
+        line3_tbl3_hourly_7_day.legend.location = legend_location
 
-    line3_tbl3_hourly_7_day.legend.label_text_font_size = legend_font_size
+        line3_tbl3_hourly_7_day.legend.label_text_font_size = legend_font_size
 
-    line3_tbl3_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
-
-#######################################
-# Calculate the BEST_FIT line against _MAX
-#######################################
-
-    int_list = []
-
-    for mydate in df_hourly_7_day_tbl_3[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line3_tbl3_hourly_7_day.line(df_hourly_7_day_tbl_3[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW3_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-    my_mean = np.mean(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
-
-    my_std  = np.std(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
-
-    for count, i in enumerate(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2]):
-
-        if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-
-            line3_tbl3_hourly_7_day.circle( x=df_hourly_7_day_tbl_3.iloc[count:count+1,0], y = df_hourly_7_day_tbl_3.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW3_COL_Y_AXIS_2 + " Outlier")
-
-   
-
+        line3_tbl3_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
 
     #######################################
-    # Visualized
+    # Calculate the BEST_FIT line against _MAX
     #######################################
 
-    #######################################
-    # Visualize Daily Data
-    #######################################
+        int_list = []
 
+        for mydate in df_hourly_7_day_tbl_3[CONFIG_ROW1_COL_X_AXIS]:
 
-    line3_tbl3_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+            int_list.append(date_to_seconds(mydate))
 
-    line3_tbl3_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
+            int_list = sorted(int_list)
 
-    line3_tbl3_daily.title.align = "center"
+        xs = np.array(int_list, dtype = float)
 
-    line3_tbl3_daily.title.text_color = "white"
+        ys = np.array(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], dtype = float)
 
-    line3_tbl3_daily.title.text_font_size = "15px"
+        m, b = best_fit(xs, ys)
 
-    line3_tbl3_daily.title.background_fill_color = "darkblue"##aaaaee"
+        regression_line = [ (m * x) + b  for x in xs]
 
-    line3_tbl3_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW3_COL_Y_AXIS_2 , alpha = 0.5, color=("red"),  source=df_daily_30_day_tbl_3, legend_label = ('DAILY ' + CONFIG_ROW3_COL_Y_AXIS_2))#, legend = "db_raw_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
-
-    line3_tbl3_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_1 , alpha = 0.5, color=("blue"), source=df_daily_30_day_tbl_3, legend_label = ("DAILY " + CONFIG_ROW3_COL_Y_AXIS_1))#, legend = ["db_raw_SIZE_AVG","db_raw_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
-
-    line3_tbl3_daily.legend.location = legend_location
-
-    line3_tbl3_daily.legend.label_text_font_size = legend_font_size
-
-    line3_tbl3_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
+        line3_tbl3_hourly_7_day.line(df_hourly_7_day_tbl_3[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW3_COL_Y_AXIS_2)
 
     #######################################
-# Calculate the BEST_FIT line against _MAX
-# Left in for purposes of using at a later date
-# so do not delete out the this commented section
-# of code.
-#######################################
-
-    int_list = []
-
-    for mydate in df_daily_30_day_tbl_3[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line3_tbl3_daily.line(df_daily_30_day_tbl_3[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW3_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-    # 
-
-    # my_mean = np.mean(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
-
-    # my_std  = np.std(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
-
-    # for count, i in enumerate(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2]):
-
-    #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-            
-    #         line3_tbl3_daily.circle( x=df_daily_30_day_tbl_3.iloc[count:count+1,0], y = df_daily_30_day_tbl_3.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW3_COL_Y_AXIS_2 + " Outlier")
-
-
-
-    #######################################
-    # Visualize Entire Data
+    # Calculate the OUTLIERS
     #######################################
 
-    vbar_tbl3_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
-                                       y1 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
-                                       y2 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
-                                       ))
+        my_mean = np.mean(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
+
+        my_std  = np.std(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
+
+        for count, i in enumerate(df_hourly_7_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2]):
+
+            if ( ( i - my_mean ) / my_std ) > outlier_threshold:
+
+                line3_tbl3_hourly_7_day.circle( x=df_hourly_7_day_tbl_3.iloc[count:count+1,0], y = df_hourly_7_day_tbl_3.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW3_COL_Y_AXIS_2 + " Outlier")
+
+       
 
 
-    vbar_tbl3_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+        #######################################
+        # Visualized
+        #######################################
 
-    vbar_tbl3_tot_col1.title.text = (CONFIG_HOURLY_TBL)
+        #######################################
+        # Visualize Daily Data
+        #######################################
 
-    vbar_tbl3_tot_col1.title.align = "center"
 
-    vbar_tbl3_tot_col1.title.text_color = "yellow"
+        line3_tbl3_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
 
-    vbar_tbl3_tot_col1.title.text_font_size = "15px"
+        line3_tbl3_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
 
-    vbar_tbl3_tot_col1.title.background_fill_color = "darkblue"
+        line3_tbl3_daily.title.align = "center"
 
-    vbar_tbl3_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl3_source, legend_label = CONFIG_ROW3_COL_Y_AXIS_1)
+        line3_tbl3_daily.title.text_color = "white"
 
-    vbar_tbl3_tot_col1.legend.location = legend_location
+        line3_tbl3_daily.title.text_font_size = "15px"
 
-    vbar_tbl3_tot_col1.legend.label_text_font_size = legend_font_size
+        line3_tbl3_daily.title.background_fill_color = "darkblue"##aaaaee"
 
-    varea_tbl3_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS], 
-                                       y1 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1],
-                                       y2 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2],
-                                       ))
+        line3_tbl3_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW3_COL_Y_AXIS_2 , alpha = 0.5, color=("red"),  source=df_daily_30_day_tbl_3, legend_label = ('DAILY ' + CONFIG_ROW3_COL_Y_AXIS_2))#, legend = "db_raw_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
 
-    vbar_tbl3_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+        line3_tbl3_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW3_COL_Y_AXIS_1 , alpha = 0.5, color=("blue"), source=df_daily_30_day_tbl_3, legend_label = ("DAILY " + CONFIG_ROW3_COL_Y_AXIS_1))#, legend = ["db_raw_SIZE_AVG","db_raw_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
 
-    vbar_tbl3_tot_col2.title.text = (CONFIG_HOURLY_TBL)
+        line3_tbl3_daily.legend.location = legend_location
 
-    vbar_tbl3_tot_col2.title.align = "center"
+        line3_tbl3_daily.legend.label_text_font_size = legend_font_size
 
-    vbar_tbl3_tot_col2.title.text_color = "yellow"
+        line3_tbl3_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
 
-    vbar_tbl3_tot_col2.title.text_font_size = "15px"
+        #######################################
+    # Calculate the BEST_FIT line against _MAX
+    # Left in for purposes of using at a later date
+    # so do not delete out the this commented section
+    # of code.
+    #######################################
 
-    vbar_tbl3_tot_col2.title.background_fill_color = "darkblue"
+        int_list = []
 
-    vbar_tbl3_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl3_stack_source, legend_label = CONFIG_ROW3_COL_Y_AXIS_2)
+        for mydate in df_daily_30_day_tbl_3[CONFIG_ROW1_COL_X_AXIS]:
 
-    vbar_tbl3_tot_col2.legend.location = legend_location
+            int_list.append(date_to_seconds(mydate))
 
-    vbar_tbl3_tot_col2.legend.label_text_font_size = legend_font_size
+            int_list = sorted(int_list)
+
+        xs = np.array(int_list, dtype = float)
+
+        ys = np.array(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], dtype = float)
+
+        m, b = best_fit(xs, ys)
+
+        regression_line = [ (m * x) + b  for x in xs]
+
+        line3_tbl3_daily.line(df_daily_30_day_tbl_3[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW3_COL_Y_AXIS_2)
+
+    #######################################
+    # Calculate the OUTLIERS
+    #######################################
+
+        # 
+
+        # my_mean = np.mean(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
+
+        # my_std  = np.std(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2])
+
+        # for count, i in enumerate(df_daily_30_day_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2]):
+
+        #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
+                
+        #         line3_tbl3_daily.circle( x=df_daily_30_day_tbl_3.iloc[count:count+1,0], y = df_daily_30_day_tbl_3.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW3_COL_Y_AXIS_2 + " Outlier")
+
+
+
+        #######################################
+        # Visualize Entire Data
+        #######################################
+
+        vbar_tbl3_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
+                                           y1 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
+                                           y2 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
+                                           ))
+
+
+        vbar_tbl3_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+
+        vbar_tbl3_tot_col1.title.text = (CONFIG_HOURLY_TBL)
+
+        vbar_tbl3_tot_col1.title.align = "center"
+
+        vbar_tbl3_tot_col1.title.text_color = "yellow"
+
+        vbar_tbl3_tot_col1.title.text_font_size = "15px"
+
+        vbar_tbl3_tot_col1.title.background_fill_color = "darkblue"
+
+        vbar_tbl3_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl3_source, legend_label = CONFIG_ROW3_COL_Y_AXIS_1)
+
+        vbar_tbl3_tot_col1.legend.location = legend_location
+
+        vbar_tbl3_tot_col1.legend.label_text_font_size = legend_font_size
+
+        varea_tbl3_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_3[CONFIG_ROW1_COL_X_AXIS], 
+                                           y1 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_1],
+                                           y2 = df_hourly_full_tbl_3[CONFIG_ROW3_COL_Y_AXIS_2],
+                                           ))
+
+        vbar_tbl3_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+
+        vbar_tbl3_tot_col2.title.text = (CONFIG_HOURLY_TBL)
+
+        vbar_tbl3_tot_col2.title.align = "center"
+
+        vbar_tbl3_tot_col2.title.text_color = "yellow"
+
+        vbar_tbl3_tot_col2.title.text_font_size = "15px"
+
+        vbar_tbl3_tot_col2.title.background_fill_color = "darkblue"
+
+        vbar_tbl3_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl3_stack_source, legend_label = CONFIG_ROW3_COL_Y_AXIS_2)
+
+        vbar_tbl3_tot_col2.legend.location = legend_location
+
+        vbar_tbl3_tot_col2.legend.label_text_font_size = legend_font_size
 
 
 
@@ -2028,197 +2055,197 @@ for config_section in config_sections:
     #      #    #    #  ####    #####  ######  ####
     ###############################################################################
 
-
+    if COLS_TBL4:
     #######################################
     # Visualize Hourly Past  7 Day Data
     #######################################
 
-    line4_tbl4_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+        line4_tbl4_hourly_7_day = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
 
-    line4_tbl4_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
+        line4_tbl4_hourly_7_day.title.text = (str(N_hourly_days) + " Day " +  CONFIG_HOURLY_TBL)
 
-    line4_tbl4_hourly_7_day.title.align = "center"
+        line4_tbl4_hourly_7_day.title.align = "center"
 
-    line4_tbl4_hourly_7_day.title.text_color = "white"
+        line4_tbl4_hourly_7_day.title.text_color = "white"
 
-    line4_tbl4_hourly_7_day.title.text_font_size = "15px"
+        line4_tbl4_hourly_7_day.title.text_font_size = "15px"
 
-    line4_tbl4_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
+        line4_tbl4_hourly_7_day.title.background_fill_color = "darkblue"##aaaaee"
 
-    line4_tbl4_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_4, legend_label = ('HOURLY ' + CONFIG_ROW4_COL_Y_AXIS_2) )
+        line4_tbl4_hourly_7_day.diamond( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_2 , line_width = 3, alpha = 0.5, color=("red"),  source=df_hourly_7_day_tbl_4, legend_label = ('HOURLY ' + CONFIG_ROW4_COL_Y_AXIS_2) )
 
-    line4_tbl4_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_4, legend_label = ("HOURLY"  + CONFIG_ROW4_COL_Y_AXIS_1))
+        line4_tbl4_hourly_7_day.circle( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_1 , line_width = 2, alpha = 0.5, color=("blue"), source=df_hourly_7_day_tbl_4, legend_label = ("HOURLY"  + CONFIG_ROW4_COL_Y_AXIS_1))
 
-    line4_tbl4_hourly_7_day.legend.location = legend_location
+        line4_tbl4_hourly_7_day.legend.location = legend_location
 
-    line4_tbl4_hourly_7_day.legend.label_text_font_size = legend_font_size
+        line4_tbl4_hourly_7_day.legend.label_text_font_size = legend_font_size
 
-    line4_tbl4_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
-
-#######################################
-# Calculate the BEST_FIT line against _MAX
-#######################################
-
-    int_list = []
-
-    for mydate in df_hourly_7_day_tbl_4[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line4_tbl4_hourly_7_day.line(df_hourly_7_day_tbl_4[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW4_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-    
-    my_mean = np.mean(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
-
-    my_std  = np.std(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
-
-    for count, i in enumerate(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]):
-
-        if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-
-            line4_tbl4_hourly_7_day.circle( x=df_hourly_7_day_tbl_4.iloc[count:count+1,0], y = df_hourly_7_day_tbl_4.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW4_COL_Y_AXIS_2 + " Outlier")
-
-   
-
+        line4_tbl4_hourly_7_day.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
 
     #######################################
-    # Visualized
+    # Calculate the BEST_FIT line against _MAX
     #######################################
 
-    #######################################
-    # Visualize Daily Data
-    #######################################
+        int_list = []
 
+        for mydate in df_hourly_7_day_tbl_4[CONFIG_ROW1_COL_X_AXIS]:
 
-    line4_tbl4_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
+            int_list.append(date_to_seconds(mydate))
 
-    line4_tbl4_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
+            int_list = sorted(int_list)
 
-    line4_tbl4_daily.title.align = "center"
+        xs = np.array(int_list, dtype = float)
 
-    line4_tbl4_daily.title.text_color = "white"
+        ys = np.array(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], dtype = float)
 
-    line4_tbl4_daily.title.text_font_size = "15px"
+        m, b = best_fit(xs, ys)
 
-    line4_tbl4_daily.title.background_fill_color = "darkblue"##aaaaee"
+        regression_line = [ (m * x) + b  for x in xs]
 
-    line4_tbl4_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW4_COL_Y_AXIS_2 , color=("red"),  source=df_daily_30_day_tbl_4, legend_label = ('DAILY ' + CONFIG_ROW4_COL_Y_AXIS_2))#, legend = "db_tbl_4_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
-
-    line4_tbl4_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_1 , color=("blue"), source=df_daily_30_day_tbl_4, legend_label = ("DAILY " + CONFIG_ROW4_COL_Y_AXIS_1))#, legend = ["db_tbl_4_SIZE_AVG","db_tbl_4_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
-
-    line4_tbl4_daily.legend.location = legend_location
-
-    line4_tbl4_daily.legend.label_text_font_size = legend_font_size
-
-    line4_tbl4_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") #xxxxx
-
-#######################################
-# Calculate the BEST_FIT line against _MAX
-# Left in for purposes of using at a later date
-# so do not delete out the this commented section
-# of code.
-#######################################
-
-    int_list = []
-
-    for mydate in df_daily_30_day_tbl_4[CONFIG_ROW1_COL_X_AXIS]:
-
-        int_list.append(date_to_seconds(mydate))
-
-        int_list = sorted(int_list)
-
-    xs = np.array(int_list, dtype = float)
-
-    ys = np.array(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], dtype = float)
-
-    m, b = best_fit(xs, ys)
-
-    regression_line = [ (m * x) + b  for x in xs]
-
-    line4_tbl4_daily.line(df_daily_30_day_tbl_4[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW4_COL_Y_AXIS_2)
-
-#######################################
-# Calculate the OUTLIERS
-#######################################
-
-
-    # my_mean = np.mean(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
-
-    # my_std  = np.std(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
-
-    # for count, i in enumerate(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]):
-
-    #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
-            
-    #         line4_tbl4_daily.circle( x=df_daily_30_day_tbl_4.iloc[count:count+1,0], y = df_daily_30_day_tbl_4.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW4_COL_Y_AXIS_2 + " Outlier")
-
-
-
+        line4_tbl4_hourly_7_day.line(df_hourly_7_day_tbl_4[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = 'BEST_FIT of ' + CONFIG_ROW4_COL_Y_AXIS_2)
 
     #######################################
-    # Visualize Entire Data
+    # Calculate the OUTLIERS
     #######################################
 
-    vbar_tbl4_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS],
-                                       y1 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1],
-                                       y2 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]))
+        
+        my_mean = np.mean(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
+
+        my_std  = np.std(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
+
+        for count, i in enumerate(df_hourly_7_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]):
+
+            if ( ( i - my_mean ) / my_std ) > outlier_threshold:
+
+                line4_tbl4_hourly_7_day.circle( x=df_hourly_7_day_tbl_4.iloc[count:count+1,0], y = df_hourly_7_day_tbl_4.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW4_COL_Y_AXIS_2 + " Outlier")
+
+       
 
 
-    vbar_tbl4_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+        #######################################
+        # Visualized
+        #######################################
 
-    vbar_tbl4_tot_col1.title.text = (CONFIG_HOURLY_TBL)
-
-    vbar_tbl4_tot_col1.title.align = "center"
-
-    vbar_tbl4_tot_col1.title.text_color = "yellow"
-
-    vbar_tbl4_tot_col1.title.text_font_size = "15px"
-
-    vbar_tbl4_tot_col1.title.background_fill_color = "darkblue"
-
-    vbar_tbl4_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl4_source, legend_label = CONFIG_ROW4_COL_Y_AXIS_1)
-
-    vbar_tbl4_tot_col1.legend.location = legend_location
-
-    vbar_tbl4_tot_col1.legend.label_text_font_size = legend_font_size
+        #######################################
+        # Visualize Daily Data
+        #######################################
 
 
-    varea_tbl4_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
-                                       y1 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
-                                       y2 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
-                                       ))
+        line4_tbl4_daily = figure(plot_width=largeplotWidth, plot_height=largeplotHeight,  x_axis_type="datetime")
 
-    vbar_tbl4_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+        line4_tbl4_daily.title.text = (str(reports_daily) + " Days " + CONFIG_DAILY_TBL)
 
-    vbar_tbl4_tot_col2.title.text = (CONFIG_HOURLY_TBL)
+        line4_tbl4_daily.title.align = "center"
 
-    vbar_tbl4_tot_col2.title.align = "center"
+        line4_tbl4_daily.title.text_color = "white"
 
-    vbar_tbl4_tot_col2.title.text_color = "yellow"
+        line4_tbl4_daily.title.text_font_size = "15px"
 
-    vbar_tbl4_tot_col2.title.text_font_size = "15px"
+        line4_tbl4_daily.title.background_fill_color = "darkblue"##aaaaee"
 
-    vbar_tbl4_tot_col2.title.background_fill_color = "darkblue"
+        line4_tbl4_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y =   CONFIG_ROW4_COL_Y_AXIS_2 , color=("red"),  source=df_daily_30_day_tbl_4, legend_label = ('DAILY ' + CONFIG_ROW4_COL_Y_AXIS_2))#, legend = "db_tbl_4_SIZE_MAX")#, hatch_weight = 5, legend_label="Sunrise")
 
-    vbar_tbl4_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl4_stack_source, legend_label = CONFIG_ROW4_COL_Y_AXIS_2)
+        line4_tbl4_daily.line( x=CONFIG_ROW1_COL_X_AXIS, y = CONFIG_ROW4_COL_Y_AXIS_1 , color=("blue"), source=df_daily_30_day_tbl_4, legend_label = ("DAILY " + CONFIG_ROW4_COL_Y_AXIS_1))#, legend = ["db_tbl_4_SIZE_AVG","db_tbl_4_SIZE_MAX"])#, hatch_weight = 5, legend_label="Sunrise")
 
-    vbar_tbl4_tot_col2.legend.location = legend_location
+        line4_tbl4_daily.legend.location = legend_location
 
-    vbar_tbl4_tot_col2.legend.label_text_font_size = legend_font_size
+        line4_tbl4_daily.legend.label_text_font_size = legend_font_size
+
+        line4_tbl4_daily.yaxis[0].formatter = NumeralTickFormatter(format="1,000") 
+
+    #######################################
+    # Calculate the BEST_FIT line against _MAX
+    # Left in for purposes of using at a later date
+    # so do not delete out the this commented section
+    # of code.
+    #######################################
+
+        int_list = []
+
+        for mydate in df_daily_30_day_tbl_4[CONFIG_ROW1_COL_X_AXIS]:
+
+            int_list.append(date_to_seconds(mydate))
+
+            int_list = sorted(int_list)
+
+        xs = np.array(int_list, dtype = float)
+
+        ys = np.array(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], dtype = float)
+
+        m, b = best_fit(xs, ys)
+
+        regression_line = [ (m * x) + b  for x in xs]
+
+        line4_tbl4_daily.line(df_daily_30_day_tbl_4[CONFIG_ROW1_COL_X_AXIS], regression_line, color = 'yellow', alpha = 0.3, line_width = 6, legend_label = "BEST_FIT of " + CONFIG_ROW4_COL_Y_AXIS_2)
+
+    #######################################
+    # Calculate the OUTLIERS
+    #######################################
+
+
+        # my_mean = np.mean(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
+
+        # my_std  = np.std(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2])
+
+        # for count, i in enumerate(df_daily_30_day_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]):
+
+        #     if ( ( i - my_mean ) / my_std ) > outlier_threshold:
+                
+        #         line4_tbl4_daily.circle( x=df_daily_30_day_tbl_4.iloc[count:count+1,0], y = df_daily_30_day_tbl_4.iloc[count:count+1,2] , line_width = 7, alpha = 0.5, color=("green"), legend_label = CONFIG_ROW4_COL_Y_AXIS_2 + " Outlier")
+
+
+
+
+        #######################################
+        # Visualize Entire Data
+        #######################################
+
+        vbar_tbl4_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS],
+                                           y1 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1],
+                                           y2 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2]))
+
+
+        vbar_tbl4_tot_col1 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+
+        vbar_tbl4_tot_col1.title.text = (CONFIG_HOURLY_TBL)
+
+        vbar_tbl4_tot_col1.title.align = "center"
+
+        vbar_tbl4_tot_col1.title.text_color = "yellow"
+
+        vbar_tbl4_tot_col1.title.text_font_size = "15px"
+
+        vbar_tbl4_tot_col1.title.background_fill_color = "darkblue"
+
+        vbar_tbl4_tot_col1.vbar(x = 'x', top = 'y1', color= "blue",  width = 3, source=vbar_tbl4_source, legend_label = CONFIG_ROW4_COL_Y_AXIS_1)
+
+        vbar_tbl4_tot_col1.legend.location = legend_location
+
+        vbar_tbl4_tot_col1.legend.label_text_font_size = legend_font_size
+
+
+        varea_tbl4_stack_source = ColumnDataSource(data=dict(x = df_hourly_full_tbl_4[CONFIG_ROW1_COL_X_AXIS], #INTERVAL_START, 
+                                           y1 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_1], #LIST_RAW_SIZE_AVG, 
+                                           y2 = df_hourly_full_tbl_4[CONFIG_ROW4_COL_Y_AXIS_2], #LIST_RAW_SIZE_MAX, 
+                                           ))
+
+        vbar_tbl4_tot_col2 = figure(plot_width=smallplotWidth, plot_height=smallplotHeight,  x_axis_type="datetime")
+
+        vbar_tbl4_tot_col2.title.text = (CONFIG_HOURLY_TBL)
+
+        vbar_tbl4_tot_col2.title.align = "center"
+
+        vbar_tbl4_tot_col2.title.text_color = "yellow"
+
+        vbar_tbl4_tot_col2.title.text_font_size = "15px"
+
+        vbar_tbl4_tot_col2.title.background_fill_color = "darkblue"
+
+        vbar_tbl4_tot_col2.vbar(x = 'x', top = 'y2', color= "red",  width = 3, source=varea_tbl4_stack_source, legend_label = CONFIG_ROW4_COL_Y_AXIS_2)
+
+        vbar_tbl4_tot_col2.legend.location = legend_location
+
+        vbar_tbl4_tot_col2.legend.label_text_font_size = legend_font_size
 
 ###################################
 # Prepare visualization by grouping charts into rows and columns
@@ -2250,55 +2277,96 @@ for config_section in config_sections:
 # Same again  - Prep by grouping and add row headings
 ###################################
 
-    p_tbl2  = column(vbar_tbl2_tot_col1, vbar_tbl2_tot_col2)
+    if COLS_TBL2:
 
-    p_ctbl2 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW2_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW2_COL_Y_AXIS_2 + "</H3>"), p_tbl2)
+        p_tbl2  = column(vbar_tbl2_tot_col1, vbar_tbl2_tot_col2)
 
-    p_tbl3  = column(vbar_tbl3_tot_col1, vbar_tbl3_tot_col2)
+        p_ctbl2 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW2_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW2_COL_Y_AXIS_2 + "</H3>"), p_tbl2)
 
-    p_ctbl3 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW3_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW3_COL_Y_AXIS_2 + "</H3>"), p_tbl3)
+    if COLS_TBL3:
 
-    p_tbl4 = column(vbar_tbl4_tot_col1, vbar_tbl4_tot_col2)
+        p_tbl3  = column(vbar_tbl3_tot_col1, vbar_tbl3_tot_col2)
 
-    p_ctbl4 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW4_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW4_COL_Y_AXIS_2 + "</H3>"), p_tbl4)
+        p_ctbl3 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW3_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW3_COL_Y_AXIS_2 + "</H3>"), p_tbl3)
+
+    if COLS_TBL4:
+
+        p_tbl4 = column(vbar_tbl4_tot_col1, vbar_tbl4_tot_col2)
+
+        p_ctbl4 = column(Div(text = "<H3 style=\"text-align:center;\">" + CONFIG_ROW4_COL_Y_AXIS_1 + "\t&\t" + CONFIG_ROW4_COL_Y_AXIS_2 + "</H3>"), p_tbl4)
 
 
     MEM_OBJECT_GRIDPLOT = gridplot([[p_ctbl1, 
         line1_tbl1_daily, 
-        line1_tbl1_hourly_7_day], 
-        [p_ctbl2, 
-        line2_tbl2_daily,
-        line2_tbl2_hourly_7_day],
-        [p_ctbl3,
-        line3_tbl3_daily,
-        line3_tbl3_hourly_7_day],
-        [p_ctbl4,
-        line4_tbl4_daily,
-        line4_tbl4_hourly_7_day]], toolbar_location='right')
+        line1_tbl1_hourly_7_day]], toolbar_location='right')
+
+    if COLS_TBL2:
+
+        MEM_OBJECT_GRIDPLOT = gridplot([[p_ctbl1, 
+            line1_tbl1_daily, 
+            line1_tbl1_hourly_7_day], 
+            [p_ctbl2, 
+            line2_tbl2_daily,
+            line2_tbl2_hourly_7_day]], toolbar_location='right')
+
+    if COLS_TBL3:
+
+        MEM_OBJECT_GRIDPLOT = gridplot([[p_ctbl1, 
+            line1_tbl1_daily, 
+            line1_tbl1_hourly_7_day], 
+            [p_ctbl2, 
+            line2_tbl2_daily,
+            line2_tbl2_hourly_7_day],
+            [p_ctbl3,
+            line3_tbl3_daily,
+            line3_tbl3_hourly_7_day]], toolbar_location='right')
+
+    if COLS_TBL4:
+
+        MEM_OBJECT_GRIDPLOT = gridplot([[p_ctbl1, 
+            line1_tbl1_daily, 
+            line1_tbl1_hourly_7_day], 
+            [p_ctbl2, 
+            line2_tbl2_daily,
+            line2_tbl2_hourly_7_day],
+            [p_ctbl3,
+            line3_tbl3_daily,
+            line3_tbl3_hourly_7_day],
+            [p_ctbl4,
+            line4_tbl4_daily,
+            line4_tbl4_hourly_7_day]], toolbar_location='right')
+
+
 
     line1_tbl1_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
                                         formatters = {"$x" :'datetime'}))
 
     line1_tbl1_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
                                         formatters = {"$x" :'datetime'}))
+    if COLS_TBL2:
  
-    line2_tbl2_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
-                                        formatters = {"$x" :'datetime'}))
 
-    line2_tbl2_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
-                                        formatters = {"$x" :'datetime'}))
+        line2_tbl2_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
+                                            formatters = {"$x" :'datetime'}))
 
-    line3_tbl3_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
-                                        formatters = {"$x" :'datetime'}))
+        line2_tbl2_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
+                                            formatters = {"$x" :'datetime'}))
+    
+    if COLS_TBL3:
 
-    line3_tbl3_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
-                                        formatters = {"$x" :'datetime'}))
+        line3_tbl3_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
+                                            formatters = {"$x" :'datetime'}))
 
-    line4_tbl4_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
-                                        formatters = {"$x" :'datetime'}))
+        line3_tbl3_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
+                                            formatters = {"$x" :'datetime'}))
 
-    line4_tbl4_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
-                                        formatters = {"$x" :'datetime'}))
+    if COLS_TBL4:
+
+        line4_tbl4_daily.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%F}")],
+                                            formatters = {"$x" :'datetime'}))
+
+        line4_tbl4_hourly_7_day.add_tools(HoverTool(tooltips = [(CONFIG_ROW1_COL_X_AXIS, "$x{%Y-%m-%d  hour:%H}")],
+                                            formatters = {"$x" :'datetime'}))
 
     show(column(Div(text = "<H1 style=\"text-align:center;border:1px solid red;color:yellow;background-color: darkblue;\">" + CONFIG_DAILY_TBL + " & " + CONFIG_HOURLY_TBL + "</H1>"), MEM_OBJECT_GRIDPLOT))
 
